@@ -1,0 +1,367 @@
+'use client';
+
+import { Camera, Save, X, User, FileText, Image as ImageIcon } from 'lucide-react';
+import { useState } from 'react';
+
+export default function CreateArticlePage() {
+    const [activeSection, setActiveSection] = useState('title'); // Default to title section
+    const [formData, setFormData] = useState({
+        title: '',
+        author: '',
+        image: null,
+        content: ''
+    });
+    const [errors, setErrors] = useState({});
+
+    const handleSectionChange = (section) => {
+        setActiveSection(section);
+
+        // Scroll to the section and focus on the input field
+        setTimeout(() => {
+            let inputElement;
+            switch (section) {
+                case 'title':
+                    inputElement = document.getElementById('title');
+                    if (inputElement) {
+                        const titleInput = inputElement.querySelector('input');
+                        if (titleInput) titleInput.focus();
+                    }
+                    break;
+                case 'author':
+                    inputElement = document.getElementById('author');
+                    if (inputElement) {
+                        const authorInput = inputElement.querySelector('input');
+                        if (authorInput) authorInput.focus();
+                    }
+                    break;
+                case 'image':
+                    inputElement = document.getElementById('image');
+                    if (inputElement) {
+                        const imageInput = inputElement.querySelector('input[type="file"]');
+                        if (imageInput) imageInput.focus();
+                    }
+                    break;
+                case 'content':
+                    inputElement = document.getElementById('content');
+                    if (inputElement) {
+                        const contentInput = inputElement.querySelector('textarea');
+                        if (contentInput) contentInput.focus();
+                    }
+                    break;
+            }
+        }, 100); // Small delay to ensure scrolling happens first
+    };
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
+
+        // Clear error when user starts typing
+        if (errors[name]) {
+            setErrors(prev => ({
+                ...prev,
+                [name]: ''
+            }));
+        }
+    };
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        setFormData(prev => ({
+            ...prev,
+            image: file
+        }));
+
+        // Clear error when user selects an image
+        if (errors.image) {
+            setErrors(prev => ({
+                ...prev,
+                image: ''
+            }));
+        }
+    };
+
+    const validateForm = () => {
+        const newErrors = {};
+
+        if (!formData.title.trim()) {
+            newErrors.title = 'Title is required';
+        }
+
+        if (!formData.author.trim()) {
+            newErrors.author = 'Author is required';
+        }
+
+        if (!formData.content.trim()) {
+            newErrors.content = 'Content is required';
+        }
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+
+        if (validateForm()) {
+            // Form is valid, proceed with submission
+            console.log('Form data:', formData);
+            alert('Article created successfully!');
+        } else {
+            // Form has errors, highlight the first error section
+            const firstErrorField = Object.keys(errors)[0];
+            if (firstErrorField) {
+                handleSectionChange(firstErrorField);
+            }
+        }
+    };
+
+
+
+    return (
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
+            <div className="max-w-6xl mx-auto">
+                <div className="flex flex-col lg:flex-row gap-8">
+                    {/* Sidebar Navigation */}
+                    <div className="lg:w-1/4">
+                        <div className="bg-gradient-to-b from-white to-gray-50 shadow-xl rounded-2xl p-6 border border-gray-200 sticky top-8 transition-all duration-300 hover:shadow-2xl">
+                            <div className="mb-6 pb-4 border-b border-gray-100">
+                                <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                                    <div className="p-2 bg-blue-100 rounded-lg">
+                                        <FileText className="w-4 h-4 text-blue-600" />
+                                    </div>
+                                    <span className="text-gray-700">Article Sections</span>
+                                </h2>
+                            </div>
+                            <nav className="space-y-1">
+                                <button
+                                    type="button"
+                                    onClick={() => handleSectionChange('title')}
+                                    className={`w-full text-left px-4 py-3 rounded-xl hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 transition-all duration-200 flex items-center gap-3 text-sm font-medium ${activeSection === 'title' ? 'bg-blue-50 text-blue-700 border-l-4 border-blue-500' : 'text-gray-700'} group`}
+                                    aria-label="Go to title field"
+                                >
+                                    <div className={`p-2 rounded-lg transition-colors ${activeSection === 'title' ? 'bg-blue-200' : 'bg-blue-100'} group-hover:bg-blue-200`}>
+                                        <FileText className="w-4 h-4 text-blue-600" />
+                                    </div>
+                                    <span className={`transition-colors ${activeSection === 'title' ? 'text-blue-700' : 'group-hover:text-blue-700'}`}>Title</span>
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => handleSectionChange('author')}
+                                    className={`w-full text-left px-4 py-3 rounded-xl hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 transition-all duration-200 flex items-center gap-3 text-sm font-medium ${activeSection === 'author' ? 'bg-blue-50 text-blue-700 border-l-4 border-blue-500' : 'text-gray-700'} group`}
+                                    aria-label="Go to author field"
+                                >
+                                    <div className={`p-2 rounded-lg transition-colors ${activeSection === 'author' ? 'bg-blue-200' : 'bg-blue-100'} group-hover:bg-blue-200`}>
+                                        <User className="w-4 h-4 text-blue-600" />
+                                    </div>
+                                    <span className={`transition-colors ${activeSection === 'author' ? 'text-blue-700' : 'group-hover:text-blue-700'}`}>Author</span>
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => handleSectionChange('image')}
+                                    className={`w-full text-left px-4 py-3 rounded-xl hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 transition-all duration-200 flex items-center gap-3 text-sm font-medium ${activeSection === 'image' ? 'bg-blue-50 text-blue-700 border-l-4 border-blue-500' : 'text-gray-700'} group`}
+                                    aria-label="Go to featured image field"
+                                >
+                                    <div className={`p-2 rounded-lg transition-colors ${activeSection === 'image' ? 'bg-blue-200' : 'bg-blue-100'} group-hover:bg-blue-200`}>
+                                        <ImageIcon className="w-4 h-4 text-blue-600" />
+                                    </div>
+                                    <span className={`transition-colors ${activeSection === 'image' ? 'text-blue-700' : 'group-hover:text-blue-700'}`}>Featured Image</span>
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => handleSectionChange('content')}
+                                    className={`w-full text-left px-4 py-3 rounded-xl hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 transition-all duration-200 flex items-center gap-3 text-sm font-medium ${activeSection === 'content' ? 'bg-blue-50 text-blue-700 border-l-4 border-blue-500' : 'text-gray-700'} group`}
+                                    aria-label="Go to content field"
+                                >
+                                    <div className={`p-2 rounded-lg transition-colors ${activeSection === 'content' ? 'bg-blue-200' : 'bg-blue-100'} group-hover:bg-blue-200`}>
+                                        <FileText className="w-4 h-4 text-blue-600" />
+                                    </div>
+                                    <span className={`transition-colors ${activeSection === 'content' ? 'text-blue-700' : 'group-hover:text-blue-700'}`}>Content</span>
+                                </button>
+                            </nav>
+                        </div>
+                    </div>
+
+                    {/* Main Form Content */}
+                    <div className="lg:w-3/4">
+                        <div className="bg-white shadow-xl rounded-2xl p-6 sm:p-8 border border-gray-100">
+                            <div className="flex items-center justify-between mb-8">
+                                <div>
+                                    <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+                                        <FileText className="w-8 h-8 text-blue-600" />
+                                        Create New Article
+                                    </h1>
+                                    <p className="text-gray-600 mt-2">Share your knowledge and experience with the world</p>
+                                </div>
+                            </div>
+
+                            <form className="space-y-8" onSubmit={handleSubmit}>
+                                {/* Title Field */}
+                                <div id="title" className="space-y-2">
+                                    <label htmlFor="title" className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                                        <span className="w-2 h-2 bg-blue-600 rounded-full"></span>
+                                        Title *
+                                    </label>
+                                    <div className="relative">
+                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <FileText className="h-5 w-5 text-gray-400" />
+                                        </div>
+                                        <input
+                                            type="text"
+                                            id="title"
+                                            name="title"
+                                            value={formData.title}
+                                            onChange={handleInputChange}
+                                            required
+                                            className={`w-full pl-10 pr-3 py-3 border ${errors.title ? 'border-red-500' : 'border-gray-300'} rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors`}
+                                            placeholder="Enter your article title..."
+                                        />
+                                        {errors.title && (
+                                            <p className="mt-1 text-sm text-red-600">{errors.title}</p>
+                                        )}
+                                    </div>
+
+                                </div>
+
+                                {/* Author Field */}
+                                <div id="author" className="space-y-2">
+                                    <label htmlFor="author" className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                                        <span className="w-2 h-2 bg-blue-600 rounded-full"></span>
+                                        Author *
+                                    </label>
+                                    <div className="relative">
+                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <User className="h-5 w-5 text-gray-400" />
+                                        </div>
+                                        <input
+                                            type="text"
+                                            id="author"
+                                            name="author"
+                                            value={formData.author}
+                                            onChange={handleInputChange}
+                                            required
+                                            className={`w-full pl-10 pr-3 py-3 border ${errors.author ? 'border-red-500' : 'border-gray-300'} rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors`}
+                                            placeholder="Enter author name..."
+                                        />
+                                        {errors.author && (
+                                            <p className="mt-1 text-sm text-red-600">{errors.author}</p>
+                                        )}
+                                    </div>
+
+                                </div>
+
+                                {/* Image Upload Field */}
+                                <div id="image" className="space-y-2">
+                                    <label htmlFor="image" className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                                        <span className="w-2 h-2 bg-blue-600 rounded-full"></span>
+                                        Featured Image
+                                    </label>
+                                    <div className="mt-1 space-y-4">
+                                        <div className="flex flex-col items-center justify-center w-full min-h-48 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors">
+                                            <div className="flex flex-col items-center justify-center pt-8 pb-6 px-4 text-center">
+                                                <Camera className="w-12 h-12 mb-4 text-gray-400" />
+                                                <p className="mb-2 text-sm text-gray-500">
+                                                    <span className="font-semibold text-blue-600">Click to upload</span> or drag and drop
+                                                </p>
+                                                <p className="text-xs text-gray-500 mb-4">
+                                                    PNG, JPG, GIF (MAX. 5MB)
+                                                </p>
+                                                <input
+                                                    id="image"
+                                                    name="image"
+                                                    type="file"
+                                                    accept="image/*"
+                                                    className="hidden"
+                                                    onChange={handleImageChange}
+                                                />
+                                                <label
+                                                    htmlFor="image"
+                                                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors cursor-pointer flex items-center gap-2"
+                                                >
+                                                    <Camera className="w-4 h-4" />
+                                                    Select Image
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <div className="mt-4 space-y-4">
+                                            <div className="flex items-center justify-between">
+                                                <p className="text-sm text-gray-600 font-medium">Image Preview:</p>
+                                                <button
+                                                    type="button"
+                                                    className="text-red-500 hover:text-red-700 text-sm flex items-center gap-1"
+                                                >
+                                                    <X className="w-4 h-4" />
+                                                    Remove
+                                                </button>
+                                            </div>
+                                            <div className="relative inline-block">
+                                                <img
+                                                    src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'%3E%3Crect fill='%23e2e8f0' width='200' height='200'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='14' fill='%2364748b'%3EImage Preview%3C/text%3E%3C/svg%3E"
+                                                    alt="Preview"
+                                                    className="max-h-64 rounded-lg object-cover border border-gray-200"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {errors.image && (
+                                        <p className="mt-1 text-sm text-red-600">{errors.image}</p>
+                                    )}
+                                </div>
+
+                                {/* Content Field */}
+                                <div id="content" className="space-y-2">
+                                    <label htmlFor="content" className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                                        <span className="w-2 h-2 bg-blue-600 rounded-full"></span>
+                                        Content *
+                                    </label>
+                                    <div className="relative">
+                                        <div className="absolute inset-y-0 left-0 pl-3 pt-3 flex items-start pointer-events-none">
+                                            <FileText className="h-5 w-5 text-gray-400 mt-1" />
+                                        </div>
+                                        <textarea
+                                            id="content"
+                                            name="content"
+                                            value={formData.content}
+                                            onChange={handleInputChange}
+                                            required
+                                            rows={12}
+                                            className={`w-full pl-10 pr-3 py-3 border ${errors.content ? 'border-red-500' : 'border-gray-300'} rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-none`}
+                                            placeholder="Write your article content here..."
+                                        />
+                                        {errors.content && (
+                                            <p className="mt-1 text-sm text-red-600">{errors.content}</p>
+                                        )}
+                                    </div>
+
+                                </div>
+
+                                <div className="flex items-center justify-between pt-6 border-t border-gray-200">
+                                    <button
+                                        type="button"
+                                        className="px-6 py-3 text-sm font-medium text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors flex items-center gap-2"
+                                    >
+                                        <X className="w-4 h-4" />
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        className="px-6 py-3 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 transition-all flex items-center gap-2 shadow-lg"
+                                    >
+                                        <>
+                                            <Save className="w-4 h-4" />
+                                            Create Article
+                                        </>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}

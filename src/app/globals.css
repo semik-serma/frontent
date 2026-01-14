@@ -27,50 +27,93 @@ body {
 
 /* Running text animation */
 @keyframes runText {
-  0% { transform: translateX(100%); }
-  100% { transform: translateX(-200%); }
+  0% {
+    transform: translateX(100%);
+  }
+
+  100% {
+    transform: translateX(-200%);
+  }
+}
+
+/* Slide animation */
+@keyframes slide {
+  0% {
+    transform: translateX(100%);
+  }
+
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+.animate-slide {
+  animation: slide 8s linear infinite;
 }
 
 /* RGB running border animation */
 @keyframes rgbBorder {
-  0% { border-color: rgba(255, 0, 0, 0.8); box-shadow: 0 0 20px rgba(255, 0, 0, 0.8), 0 0 40px rgba(255, 0, 0, 0.4); }
-  25% { border-color: rgba(255, 165, 0, 0.8); box-shadow: 0 0 20px rgba(255, 165, 0, 0.8), 0 0 40px rgba(255, 165, 0, 0.4); }
-  50% { border-color: rgba(0, 255, 0, 0.8); box-shadow: 0 0 20px rgba(0, 255, 0, 0.8), 0 0 40px rgba(0, 255, 0, 0.4); }
-  75% { border-color: rgba(0, 0, 255, 0.8); box-shadow: 0 0 20px rgba(0, 0, 255, 0.8), 0 0 40px rgba(0, 0, 255, 0.4); }
-  100% { border-color: rgba(255, 0, 0, 0.8); box-shadow: 0 0 20px rgba(255, 0, 0, 0.8), 0 0 40px rgba(255, 0, 0, 0.4); }
+  0% {
+    border-color: rgba(255, 0, 0, 0.8);
+    box-shadow: 0 0 20px rgba(255, 0, 0, 0.8), 0 0 40px rgba(255, 0, 0, 0.4);
+  }
+
+  25% {
+    border-color: rgba(255, 165, 0, 0.8);
+    box-shadow: 0 0 20px rgba(255, 165, 0, 0.8), 0 0 40px rgba(255, 165, 0, 0.4);
+  }
+
+  50% {
+    border-color: rgba(0, 255, 0, 0.8);
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.8), 0 0 40px rgba(0, 255, 0, 0.4);
+  }
+
+  75% {
+    border-color: rgba(0, 0, 255, 0.8);
+    box-shadow: 0 0 20px rgba(0, 0, 255, 0.8), 0 0 40px rgba(0, 0, 255, 0.4);
+  }
+
+  100% {
+    border-color: rgba(255, 0, 0, 0.8);
+    box-shadow: 0 0 20px rgba(255, 0, 0, 0.8), 0 0 40px rgba(255, 0, 0, 0.4);
+  }
 }
 
 /* Running light around border */
 @keyframes borderLight {
-  0% { 
+  0% {
     border-top-color: rgba(255, 0, 0, 1);
     border-right-color: rgba(255, 0, 0, 0.3);
     border-bottom-color: rgba(255, 0, 0, 0.3);
     border-left-color: rgba(255, 0, 0, 0.3);
     box-shadow: 0 -5px 20px rgba(255, 0, 0, 0.8);
   }
-  25% { 
+
+  25% {
     border-top-color: rgba(255, 0, 0, 0.3);
     border-right-color: rgba(255, 165, 0, 1);
     border-bottom-color: rgba(255, 165, 0, 0.3);
     border-left-color: rgba(255, 165, 0, 0.3);
     box-shadow: 5px 0 20px rgba(255, 165, 0, 0.8);
   }
-  50% { 
+
+  50% {
     border-top-color: rgba(255, 165, 0, 0.3);
     border-right-color: rgba(0, 255, 0, 0.3);
     border-bottom-color: rgba(0, 255, 0, 1);
     border-left-color: rgba(0, 255, 0, 0.3);
     box-shadow: 0 5px 20px rgba(0, 255, 0, 0.8);
   }
-  75% { 
+
+  75% {
     border-top-color: rgba(0, 255, 0, 0.3);
     border-right-color: rgba(0, 0, 255, 0.3);
     border-bottom-color: rgba(0, 0, 255, 0.3);
     border-left-color: rgba(0, 0, 255, 1);
     box-shadow: -5px 0 20px rgba(0, 0, 255, 0.8);
   }
-  100% { 
+
+  100% {
     border-top-color: rgba(0, 0, 255, 0.3);
     border-right-color: rgba(255, 0, 0, 0.3);
     border-bottom-color: rgba(255, 0, 0, 0.3);
@@ -81,4 +124,80 @@ body {
 
 .rgb-border {
   animation: borderLight 2s linear infinite;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.verify-form {
+  animation: slideIn 0.8s ease-out;
+}
+
+@keyframes gradient-border {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-gradient-border {
+  background: linear-gradient(45deg, #ff0000, #00ff00, #0000ff, #ff0000) border-box;
+  background-size: 300% 300%;
+  animation: gradient-border 3s ease infinite;
+}
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+.register-form {
+  animation: slideIn 0.8s ease-out;
+}
+
+.input-glow:focus {
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+}
+
+@keyframes pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.8;
+  }
+}
+
+.login-form {
+  animation: slideIn 0.8s ease-out;
+}
+
+.glow-effect {
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
 }
