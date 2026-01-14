@@ -25,7 +25,7 @@ export default function Home() {
                 My name is Semik and I am a web developer
               </p>
               <p className="text-lg text-blue-200 max-w-2xl">
-                Creating modern, responsive, and user-friendly web applications that bring your ideas to life.
+                I create a moderna websites using django,nextjs and others
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link
