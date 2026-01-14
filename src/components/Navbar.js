@@ -174,13 +174,13 @@ export default function Navbar() {
                   key={link.href}
                   href={link.href}
                   className={`px-4 py-2 rounded-lg text-base font-medium transition-colors relative ${isActive(link.href)
-                    ? 'text-blue-600 bg-blue-50'
+                    ? 'text-blue-600 bg-blue-50 buttonborderrunnercolor'
                     : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
                     }`}
                 >
                   {link.label}
                   {isActive(link.href) && (
-                    <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 bg-blue-600 rounded-full"></span>
+                    <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 bg-blue-600  rounded-full"></span>
                   )}
                 </Link>
               ))}

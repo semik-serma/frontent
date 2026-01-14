@@ -201,3 +201,50 @@ body {
 .glow-effect {
   box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
 }
+
+.buttonborderrunnercolor {
+  position: relative;
+  padding: 14px 32px;
+  font-size: 16px;
+  color: #ff0000;
+  background: #ffffff;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  z-index: 0;
+  overflow: hidden;
+}
+
+/* Animated RGBA border */
+.buttonborderrunnercolor::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  background: linear-gradient(
+    90deg,
+    rgba(255,0,0,1),
+    rgba(0,255,255,1),
+    rgba(0,255,0,1),
+    rgba(255,0,255,1),
+    rgba(255,0,0,1)
+  );
+  background-size: 400% 400%;
+  animation: borderRun 4s linear infinite;
+  z-index: -1;
+}
+
+/* Inner mask so only border shows */
+.buttonborderrunnercolor::after {
+  content: "";
+  position: absolute;
+  inset: 2px;
+  background: #ffffff;
+  border-radius: 6px;
+  z-index: -1;
+}
+
+@keyframes borderRun {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 400% 50%; }
+}
