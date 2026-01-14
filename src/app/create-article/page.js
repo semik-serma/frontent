@@ -4,6 +4,7 @@ import { Camera, Save, X, User, FileText, Image as ImageIcon } from 'lucide-reac
 import { useState } from 'react';
 
 export default function CreateArticlePage() {
+    const [imagePreview, setImagePreview] = useState(null);
     const [activeSection, setActiveSection] = useState('title'); // Default to title section
     const [formData, setFormData] = useState({
         title: '',
@@ -69,20 +70,23 @@ export default function CreateArticlePage() {
     };
 
     const handleImageChange = (e) => {
-        const file = e.target.files[0];
-        setFormData(prev => ({
-            ...prev,
-            image: file
-        }));
+    const file = e.target.files[0];
+    if (!file) return;
 
-        // Clear error when user selects an image
-        if (errors.image) {
-            setErrors(prev => ({
-                ...prev,
-                image: ''
-            }));
-        }
-    };
+    setFormData(prev => ({
+        ...prev,
+        image: file
+    }));
+
+    // Create browser preview URL
+    const previewURL = URL.createObjectURL(file);
+    setImagePreview(previewURL);
+
+    if (errors.image) {
+        setErrors(prev => ({ ...prev, image: "" }));
+    }
+};
+
 
     const validateForm = () => {
         const newErrors = {};

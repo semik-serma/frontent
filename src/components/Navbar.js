@@ -18,8 +18,6 @@ export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
 
-
-
   // Handle scroll effect
   useEffect(() => {
     const handleScroll = () => {
@@ -40,10 +38,9 @@ export default function Navbar() {
       setShowAnimation(true);
       setTimeout(() => {
         setShowAnimation(false);
-      }, 2500); // Animation duration
+      }, 2500);
     };
 
-    // Start animation after 3 seconds, then every 20 seconds
     const initialTimeout = setTimeout(startAnimation, 3000);
     const interval = setInterval(startAnimation, 20000);
 
@@ -54,10 +51,10 @@ export default function Navbar() {
   }, []);
 
   const handlelogout = () => {
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
+    // Removed localStorage usage - handle logout through your app's state management
     router.push('/login');
   };
+
   const searchToGoogle = (e) => {
     e.preventDefault();
     if (search.trim() !== '') {
@@ -77,7 +74,6 @@ export default function Navbar() {
 
   return (
     <>
-
       {/* Top Bar */}
       <div className="sticky top-0 w-full z-50 bg-gradient-to-r from-yellow-400 via-yellow-400 to-yellow-300 h-12 flex items-center justify-between px-4 sm:px-6 lg:px-8 shadow-lg border-b-2 border-yellow-500/30 backdrop-blur-sm relative overflow-hidden">
         <div className="flex items-center gap-2 relative z-10">
@@ -89,7 +85,7 @@ export default function Navbar() {
             className="rounded shadow-sm ring-1 ring-white/30"
           />
           <span className="text-xs sm:text-sm font-semibold text-gray-800 hidden sm:inline-block">
-            Welcome to my website
+            Welcome for visiting my website
           </span>
         </div>
 
@@ -112,7 +108,6 @@ export default function Navbar() {
             <Link href='https://www.youtube.com/@digitalmediacenterphidim6022'><FaYoutube /></Link>
             <Link href='https://www.linkedin.com/in/semik-serma-8263a3391/'><FaLinkedin /></Link>
             <Link href='https://wa.me/9817926978'><FaWhatsappSquare /></Link>
-
           </div>
           <div className="h-4 w-px bg-gray-800/30"></div>
           <div className="flex items-center gap-1.5 text-gray-800">
@@ -180,7 +175,7 @@ export default function Navbar() {
                 >
                   {link.label}
                   {isActive(link.href) && (
-                    <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 bg-blue-600  rounded-full"></span>
+                    <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 bg-blue-600 rounded-full"></span>
                   )}
                 </Link>
               ))}
@@ -190,15 +185,22 @@ export default function Navbar() {
             <div className="hidden md:flex items-center gap-3 ml-4">
               <Link
                 href="/login"
-                className="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-medium hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 border-2 border-transparent bg-clip-border animate-gradient-border"
+                className="relative inline-flex items-center justify-center px-5 py-2.5 rounded-lg bg-slate-900 overflow-hidden group"
               >
-                Login
+                <span className="absolute inset-0 rounded-lg bg-[linear-gradient(120deg,rgba(59,130,246,0.8),rgba(139,92,246,0.8),rgba(236,72,153,0.8))] blur-sm animate-pulse"></span>
+                <span className="absolute inset-0 rounded-lg border-2 border-transparent bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 opacity-75 group-hover:opacity-100 transition-opacity duration-300" style={{WebkitMask: 'linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)', WebkitMaskComposite: 'xor', maskComposite: 'exclude'}}></span>
+                <span className="absolute inset-[2px] rounded-lg bg-slate-900"></span>
+                <span className="relative z-10 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent font-semibold">
+                  Login
+                </span>
               </Link>
-
+              <button 
+                onClick={handlelogout}
+                className="px-5 py-2.5 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition"
+              >
+                Logout
+              </button>
             </div>
-            <button onClick={handlelogout}>
-              Logout
-            </button>
 
             {/* Mobile Menu Button */}
             <button
@@ -280,7 +282,6 @@ export default function Navbar() {
           </div>
         </div>
       </div>
-
     </>
   );
 }

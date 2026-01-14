@@ -47,16 +47,16 @@ export default function About() {
               </h2>
               <div className="space-y-4 text-lg text-gray-600">
                 <p>
-                  My name is <strong className="text-gray-800">Semik</strong>, and I am a passionate web developer with a love for creating beautiful, functional, and user-friendly web applications.
+                  My name is <strong className="text-gray-800">Semik-serma</strong>, and I am a passionate developer with a love for creating beautiful, functional, and user-friendly web sites.
                 </p>
                 <p>
-                  I specialize in modern web technologies and am constantly learning and adapting to new trends and best practices in the industry. My goal is to help businesses and individuals bring their digital visions to life.
+                  I want to be successfull in my life i have to learn at least 10 programming lamnguages and become the global person for the entire world.
                 </p>
                 <p>
-                  With a strong foundation in frontend development, I focus on creating responsive, performant, and accessible web experiences that users love.
+                  I am currently doing next js and in the previous year i ahev done html,css,javascript,python and django.
                 </p>
                 <p>
-                  When I'm not coding, I enjoy exploring new technologies, contributing to open-source projects, and sharing knowledge with the developer community.
+                  When I'm not coding,i do physical execises like running,jumping,throwing and pushups. 
                 </p>
               </div>
             </div>
@@ -72,8 +72,8 @@ export default function About() {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
                   <div className="absolute bottom-6 text-center text-white z-10">
-                    <p className="text-2xl font-semibold">Web Developer</p>
-                    <p className="text-gray-200">Building the web, one line at a time</p>
+                    <p className="text-2xl font-semibold">Web devloper</p>
+                    <p className="text-gray-200">Building the websites with django,next and others.</p>
                   </div>
                 </div>
               </div>

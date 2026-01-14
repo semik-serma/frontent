@@ -25,7 +25,7 @@ export default function Home() {
                 My name is Semik and I am a web developer
               </p>
               <p className="text-lg text-blue-200 max-w-2xl">
-                I create a moderna websites using django,nextjs and others
+                I create a modern websites using django,nextjs and others,I love creting websites
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link
@@ -44,7 +44,7 @@ export default function Home() {
 
             </div>
             <div className="hidden lg:block">
-              <div className="relative h-96 w-full bg-blue-500/20 rounded-2xl backdrop-blur-sm border border-white/20 flex items-center justify-center">
+              <div className="relative h-100 w-full bg-blue-500/20 rounded-2xl backdrop-blur-sm border border-white/20 flex items-center justify-center rounded-[100px] overflow-hidden">
                 <Image
                   src="/home.png"
                   alt="Home"
@@ -76,7 +76,7 @@ export default function Home() {
               <div className="text-4xl mb-4">💻</div>
               <h3 className="text-2xl font-bold text-gray-800 mb-3">Frontend Development</h3>
               <p className="text-gray-600">
-                Modern, responsive web interfaces built with the latest technologies including React, Next.js, and Tailwind CSS.
+               I create frontend with nextjs,django and others with the experience about 1 to 2 years 
               </p>
             </div>
 
@@ -137,7 +137,7 @@ export default function Home() {
                 About Semik
               </h2>
               <p className="text-lg text-gray-600 mb-4">
-                I'm a passionate web developer dedicated to creating exceptional digital experiences. With a focus on modern technologies and best practices, I bring your vision to life through clean, efficient, and beautiful code.
+                I am experienced developer with the experience abiut 2 years now i want to learn flutter and create a mobile application.I want to succed in my lkife and make my mom dad proud of me.
               </p>
               <p className="text-lg text-gray-600 mb-4">
                 Whether you're looking for a simple website or a complex web application, I'm here to help you achieve your goals.
