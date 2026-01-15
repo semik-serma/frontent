@@ -183,17 +183,22 @@ export default function Navbar() {
 
             {/* Auth Buttons - Desktop */}
             <div className="hidden md:flex items-center gap-3 ml-4">
-              <Link
-                href="/login"
-                className="relative inline-flex items-center justify-center px-5 py-2.5 rounded-lg bg-slate-900 overflow-hidden group"
-              >
-                <span className="absolute inset-0 rounded-lg bg-[linear-gradient(120deg,rgba(59,130,246,0.8),rgba(139,92,246,0.8),rgba(236,72,153,0.8))] blur-sm animate-pulse"></span>
-                <span className="absolute inset-0 rounded-lg border-2 border-transparent bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 opacity-75 group-hover:opacity-100 transition-opacity duration-300" style={{WebkitMask: 'linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)', WebkitMaskComposite: 'xor', maskComposite: 'exclude'}}></span>
-                <span className="absolute inset-[2px] rounded-lg bg-slate-900"></span>
-                <span className="relative z-10 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent font-semibold">
-                  Login
-                </span>
-              </Link>
+             <Link
+  href="/login"
+  className="relative inline-flex items-center justify-center px-6 py-2.5 rounded-xl group"
+>
+  {/* Animated neon border */}
+  <span className="absolute inset-0 rounded-xl p-[2px] bg-[linear-gradient(120deg,rgba(34,211,238,1),rgba(168,85,247,1),rgba(236,72,153,1),rgba(34,211,238,1))] bg-[length:300%_300%] animate-[borderMove_4s_linear_infinite]"></span>
+
+  {/* Inner dark background */}
+  <span className="absolute inset-[2px] rounded-xl bg-[#020617]"></span>
+
+  {/* Button text */}
+  <span className="relative z-10 bg-gradient-to-r from-cyan-300 to-purple-400 bg-clip-text text-transparent font-semibold tracking-wide">
+    Login
+  </span>
+</Link>
+
               <button 
                 onClick={handlelogout}
                 className="px-5 py-2.5 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition"

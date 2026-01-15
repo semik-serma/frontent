@@ -8,7 +8,7 @@ export default function Home() {
 
 
   const openWhatsApp = () => {
-    window.open('https://wa.me/9779862772457?text=What can I help you with', '_blank');
+    window.open('https://wa.me/9779862772457?text=Hey i have visited your website', '_blank');
   };
 
   return (
@@ -52,7 +52,28 @@ export default function Home() {
                   className="object-cover rounded-2xl"
                   priority
                 />
+                
               </div>
+<div className="flex items-center gap-3 ml-60">
+  {/* Download CV */}
+  <button className="bg-[#020617] px-4 py-1.5 rounded-lg text-sm font-semibold text-cyan-300 border border-cyan-400 shadow-[0_0_10px_rgba(34,211,238,0.5)] hover:shadow-[0_0_18px_rgba(34,211,238,0.9)] hover:scale-105 transition-all duration-300">
+    <a href="/" download>
+      📄 Download cv
+    </a>
+  </button>
+
+  {/* Hire Me */}
+  <button
+    onClick={openWhatsApp}
+    className="bg-gradient-to-r from-purple-600 to-pink-600 px-4 py-1.5 rounded-lg text-sm font-semibold text-white shadow-[0_0_10px_rgba(236,72,153,0.6)] hover:shadow-[0_0_18px_rgba(236,72,153,1)] hover:scale-105 transition-all duration-300"
+  >
+    💬 Hire
+  </button>
+</div>
+
+
+
+
             </div>
           </div>
         </div>
