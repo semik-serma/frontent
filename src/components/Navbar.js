@@ -12,65 +12,77 @@ import { FaWhatsappSquare } from "react-icons/fa";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
-  const [search, setSearch] = useState('');
-  const [scrolled, setScrolled] = useState(false);
-  const [showAnimation, setShowAnimation] = useState(false);
-  const pathname = usePathname();
-  const router = useRouter();
+const [isLoggedIn, setIsLoggedIn] = useState(false);
+const [search, setSearch] = useState('');
+const [scrolled, setScrolled] = useState(false);
+const [showAnimation, setShowAnimation] = useState(false);
+const pathname = usePathname();
+const router = useRouter();
 
-  // Handle scroll effect
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 10);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+// Handle scroll effect
+useEffect(() => {
+  const handleScroll = () => {
+    setScrolled(window.scrollY > 10);
+  };
+  window.addEventListener('scroll', handleScroll);
+  return () => window.removeEventListener('scroll', handleScroll);
+}, []);
 
-  // Close mobile menu when route changes
-  useEffect(() => {
-    setOpen(false);
-  }, [pathname]);
+// 🔥 Read login state from localStorage (NOT set)
+useEffect(() => {
+  const auth = localStorage.getItem("isLoggedIn") === "true";
+  setIsLoggedIn(auth);
+}, []);   // always []
 
-  // Animation effect for website text
-  useEffect(() => {
-    const startAnimation = () => {
-      setShowAnimation(true);
-      setTimeout(() => {
-        setShowAnimation(false);
-      }, 2500);
-    };
+useEffect(() => {
+  const auth = localStorage.getItem("isLoggedIn") === "true";
+  setIsLoggedIn(auth);
+}, [pathname]);   // separate effect
 
-    const initialTimeout = setTimeout(startAnimation, 3000);
-    const interval = setInterval(startAnimation, 20000);
+// Close mobile menu when route changes
+useEffect(() => {
+  setOpen(false);
+}, [pathname]);
 
-    return () => {
-      clearTimeout(initialTimeout);
-      clearInterval(interval);
-    };
-  }, []);
-
-  const handlelogout = () => {
-    // Removed localStorage usage - handle logout through your app's state management
-    router.push('/login');
+// Animation effect for website text
+useEffect(() => {
+  const startAnimation = () => {
+    setShowAnimation(true);
+    setTimeout(() => {
+      setShowAnimation(false);
+    }, 2500);
   };
 
-  const searchToGoogle = (e) => {
-    e.preventDefault();
-    if (search.trim() !== '') {
-      window.open(`https://www.google.com/search?q=${encodeURIComponent(search)}`, "_blank");
-      setSearch('');
-    }
+  const initialTimeout = setTimeout(startAnimation, 3000);
+  const interval = setInterval(startAnimation, 20000);
+
+  return () => {
+    clearTimeout(initialTimeout);
+    clearInterval(interval);
   };
+}, []);
 
-  const navLinks = [
-    { href: '/', label: 'Home' },
-    { href: '/about', label: 'About' },
-    { href: '/contact', label: 'Contact' },
-    { href: '/articles', label: 'Articles' },
-  ];
+const handlelogout = () => {
+  localStorage.removeItem("isLoggedIn");
+  setIsLoggedIn(false);
+  router.push("/login");
+};
 
-  const isActive = (href) => pathname === href;
+const searchToGoogle = (e) => {
+  e.preventDefault();
+  if (search.trim() !== '') {
+    window.open(`https://www.google.com/search?q=${encodeURIComponent(search)}`, "_blank");
+    setSearch('');
+  }
+};
+
+const navLinks = [
+  { href: '/', label: 'Home' },
+  { href: '/about', label: 'About' },
+  { href: '/contact', label: 'Contact' },
+];
+
+const isActive = (href) => pathname === href;
 
   return (
     <>
@@ -183,28 +195,33 @@ export default function Navbar() {
 
             {/* Auth Buttons - Desktop */}
             <div className="hidden md:flex items-center gap-3 ml-4">
-             <Link
-  href="/login"
-  className="relative inline-flex items-center justify-center px-6 py-2.5 rounded-xl group"
->
-  {/* Animated neon border */}
-  <span className="absolute inset-0 rounded-xl p-[2px] bg-[linear-gradient(120deg,rgba(34,211,238,1),rgba(168,85,247,1),rgba(236,72,153,1),rgba(34,211,238,1))] bg-[length:300%_300%] animate-[borderMove_4s_linear_infinite]"></span>
+             <div className="hidden md:flex items-center gap-3 ml-4">
+  {!isLoggedIn ? (
+    <Link
+      href="/login"
+      className="relative inline-flex items-center justify-center px-6 py-2.5 rounded-xl group"
+    >
+      {/* Animated neon border */}
+      <span className="absolute inset-0 rounded-xl p-[2px] bg-[linear-gradient(120deg,rgba(34,211,238,1),rgba(168,85,247,1),rgba(236,72,153,1),rgba(34,211,238,1))] bg-[length:300%_300%] animate-[borderMove_4s_linear_infinite]"></span>
 
-  {/* Inner dark background */}
-  <span className="absolute inset-[2px] rounded-xl bg-[#020617]"></span>
+      {/* Inner dark background */}
+      <span className="absolute inset-[2px] rounded-xl bg-[#020617]"></span>
 
-  {/* Button text */}
-  <span className="relative z-10 bg-gradient-to-r from-cyan-300 to-purple-400 bg-clip-text text-transparent font-semibold tracking-wide">
-    Login
-  </span>
-</Link>
+      {/* Button text */}
+      <span className="relative z-10 bg-gradient-to-r from-cyan-300 to-purple-400 bg-clip-text text-transparent font-semibold tracking-wide">
+        Login
+      </span>
+    </Link>
+  ) : (
+    <button 
+      onClick={handlelogout}
+      className="px-5 py-2.5 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition"
+    >
+      Logout
+    </button>
+  )}
+</div>
 
-              <button 
-                onClick={handlelogout}
-                className="px-5 py-2.5 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition"
-              >
-                Logout
-              </button>
             </div>
 
             {/* Mobile Menu Button */}

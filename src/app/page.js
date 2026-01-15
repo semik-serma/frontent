@@ -14,7 +14,7 @@ export default function Home() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 text-white py-20 lg:py-32">
+      <section className="relative h-160 bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 text-white py-20 lg:py-32">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-8">
@@ -54,9 +54,9 @@ export default function Home() {
                 />
                 
               </div>
-<div className="flex items-center gap-3 ml-60">
+<div className="flex items-center gap-35  mt-10 ml-23 ">
   {/* Download CV */}
-  <button className="bg-[#020617] px-4 py-1.5 rounded-lg text-sm font-semibold text-cyan-300 border border-cyan-400 shadow-[0_0_10px_rgba(34,211,238,0.5)] hover:shadow-[0_0_18px_rgba(34,211,238,0.9)] hover:scale-105 transition-all duration-300">
+  <button className="bg-[#020617]  px-4 py-1.5 rounded-lg text-sm font-semibold text-cyan-300 border border-cyan-400 shadow-[0_0_10px_rgba(34,211,238,0.5)] hover:shadow-[0_0_18px_rgba(34,211,238,0.9)] hover:scale-105 transition-all duration-300">
     <a href="/" download>
       📄 Download cv
     </a>
