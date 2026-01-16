@@ -21,23 +21,32 @@ const router = useRouter();
 
 // Handle scroll effect
 useEffect(() => {
-  const handleScroll = () => {
-    setScrolled(window.scrollY > 10);
+  const checkAuth = () => {
+    const token = localStorage.getItem("token");
+    setIsLoggedIn(!!token);
   };
-  window.addEventListener('scroll', handleScroll);
-  return () => window.removeEventListener('scroll', handleScroll);
-}, []);
+
+  checkAuth();
+
+  window.addEventListener("storage", checkAuth);
+  return () => window.removeEventListener("storage", checkAuth);
+}, [pathname]);
+
 
 // 🔥 Read login state from localStorage (NOT set)
 useEffect(() => {
-  const auth = localStorage.getItem("isLoggedIn") === "true";
-  setIsLoggedIn(auth);
-}, []);   // always []
+  const checkAuth = () => {
+    const token = localStorage.getItem("token");
+    setIsLoggedIn(!!token);
+  };
 
-useEffect(() => {
-  const auth = localStorage.getItem("isLoggedIn") === "true";
-  setIsLoggedIn(auth);
-}, [pathname]);   // separate effect
+  checkAuth();
+  window.addEventListener("storage", checkAuth);
+  return () => window.removeEventListener("storage", checkAuth);
+}, [pathname]);
+
+
+  // separate effect
 
 // Close mobile menu when route changes
 useEffect(() => {
@@ -63,10 +72,13 @@ useEffect(() => {
 }, []);
 
 const handlelogout = () => {
-  localStorage.removeItem("isLoggedIn");
-  setIsLoggedIn(false);
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+
+  window.dispatchEvent(new Event("storage")); // 🔥 forces Navbar + Footer to refresh
   router.push("/login");
 };
+
 
 const searchToGoogle = (e) => {
   e.preventDefault();
@@ -76,11 +88,18 @@ const searchToGoogle = (e) => {
   }
 };
 
-const navLinks = [
-  { href: '/', label: 'Home' },
-  { href: '/about', label: 'About' },
-  { href: '/contact', label: 'Contact' },
-];
+const navLinks = isLoggedIn
+  ? [
+      { href: "/dashboard", label: "Dashboard" },
+      { href: "/create-article", label: "Create Article" },
+      { href: "/update-article", label: "Update Article" },
+    ]
+  : [
+      { href: "/", label: "Home" },
+      { href: "/about", label: "About" },
+      { href: "/contact", label: "Contact" },
+    ];
+
 
 const isActive = (href) => pathname === href;
 

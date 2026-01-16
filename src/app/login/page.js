@@ -4,36 +4,42 @@ import Link from 'next/link';
 import { useState } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
-
+import { useEffect } from 'react';
 
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const router = useRouter();
 
-  const handleSubmit = async (event) => {
-    event.preventDefault(); // Prevent default form submission
-    const data = { email, password };
-    console.log(data);
-    try {
-      const login = await axios.post('http://localhost:2000/auth/loginuser', data);
+  useEffect(() => {
+    localStorage.removeItem("isLoggedIn");
+  }, []);
 
-      // Store user data and token in localStorage
-      localStorage.setItem('user', JSON.stringify(login.data.data.data));
-      localStorage.setItem('token', login.data.data.token);
+  const handleSubmit = async (e) => {
+  e.preventDefault();
 
-      alert('Login successful!');
+  try {
+    const response = await axios.post("http://localhost:2000/auth/loginuser", {
+      email,
+      password,
+    });
 
-      // Redirect to dashboard after successful login using Next.js router
-      router.push('/dashboard');
+    const token = response.data.data.token;
+    const user = response.data.data.data;
 
-      console.log(login);
-    } catch (error) {
-      console.error('Login error:', error);
-      alert('Login failed: ' + (error.response?.data?.message || error.message));
-    }
-  };
+    localStorage.setItem("token", token);
+    localStorage.setItem("user", JSON.stringify(user));
+    localStorage.setItem("isLoggedIn", "true");
+    document.cookie = `token=${token}; path=/`;
+
+    router.push("/dashboard");
+  } catch (error) {
+    alert(error.response?.data?.message || "Login failed");
+  }
+};
+
+
   return (
     <>
 

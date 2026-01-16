@@ -1,12 +1,7 @@
 import { Geist, Geist_Mono } from "next/font/google"
 import "./globals.css"
-import dynamic from "next/dynamic"
 import Footer from "@/components/Footer"
-
-// 👇 Load Navbar on client only
-const Navbar = dynamic(() => import("@/components/Navbar"), {
-  ssr: false,
-})
+import ClientNavbar from "@/components/ClientNavbar"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,7 +22,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <Navbar />
+        <ClientNavbar />
         {children}
         <Footer />
       </body>

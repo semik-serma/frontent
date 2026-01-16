@@ -1,9 +1,25 @@
 'use client';
 
 import { Camera, Save, X, User, FileText, Image as ImageIcon } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRef } from "react";
+import { useRouter } from "next/navigation" 
+
 
 export default function CreateArticlePage() {
+
+  const router = useRouter();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      router.push("/login");   // redirect if not logged in
+    }
+  }, []);
+
+const fileInputRef = useRef(null);
+
     const [imagePreview, setImagePreview] = useState(null);
     const [activeSection, setActiveSection] = useState('title'); // Default to title section
     const [formData, setFormData] = useState({
@@ -13,6 +29,14 @@ export default function CreateArticlePage() {
         content: ''
     });
     const [errors, setErrors] = useState({});
+    useEffect(() => {
+  return () => {
+    if (imagePreview) {
+      URL.revokeObjectURL(imagePreview);
+    }
+  };
+}, [imagePreview]);
+
 
     const handleSectionChange = (section) => {
         setActiveSection(section);
@@ -204,31 +228,35 @@ export default function CreateArticlePage() {
 
                             <form className="space-y-8" onSubmit={handleSubmit}>
                                 {/* Title Field */}
-                                <div id="title" className="space-y-2">
-                                    <label htmlFor="title" className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                                        <span className="w-2 h-2 bg-blue-600 rounded-full"></span>
-                                        Title *
-                                    </label>
-                                    <div className="relative">
-                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                            <FileText className="h-5 w-5 text-gray-400" />
-                                        </div>
-                                        <input
-                                            type="text"
-                                            id="title"
-                                            name="title"
-                                            value={formData.title}
-                                            onChange={handleInputChange}
-                                            required
-                                            className={`w-full pl-10 pr-3 py-3 border ${errors.title ? 'border-red-500' : 'border-gray-300'} rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors`}
-                                            placeholder="Enter your article title..."
-                                        />
-                                        {errors.title && (
-                                            <p className="mt-1 text-sm text-red-600">{errors.title}</p>
-                                        )}
-                                    </div>
+                                {/* Title Field */}
+<div id="title" className="space-y-2">
+  <label htmlFor="title" className="flex items-center gap-2 text-sm font-medium text-gray-700">
+    <span className="w-2 h-2 bg-blue-600 rounded-full"></span>
+    Title *
+  </label>
 
-                                </div>
+  <div className="relative">
+    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+      <FileText className="h-5 w-5 text-gray-400" />
+    </div>
+
+    <input
+  ref={fileInputRef}
+  type="file"
+  accept="image/*"
+  onChange={handleImageChange}
+  className="hidden"
+/>
+
+
+
+
+    {errors.title && (
+      <p className="mt-1 text-sm text-red-600">{errors.title}</p>
+    )}
+  </div>
+</div>
+
 
                                 {/* Author Field */}
                                 <div id="author" className="space-y-2">
@@ -285,8 +313,15 @@ export default function CreateArticlePage() {
                                                     htmlFor="image"
                                                     className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors cursor-pointer flex items-center gap-2"
                                                 >
-                                                    <Camera className="w-4 h-4" />
-                                                    Select Image
+                                                    <button
+  type="button"
+  onClick={() => fileInputRef.current?.click()}
+  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+>
+  Select Image
+</button>
+
+
                                                 </label>
                                             </div>
                                         </div>
@@ -303,11 +338,14 @@ export default function CreateArticlePage() {
                                                 </button>
                                             </div>
                                             <div className="relative inline-block">
-                                                <img
-                                                    src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'%3E%3Crect fill='%23e2e8f0' width='200' height='200'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='14' fill='%2364748b'%3EImage Preview%3C/text%3E%3C/svg%3E"
-                                                    alt="Preview"
-                                                    className="max-h-64 rounded-lg object-cover border border-gray-200"
-                                                />
+                                                {imagePreview && (
+  <img
+    src={imagePreview}
+    alt="Preview"
+    className="max-h-64 rounded-lg object-cover border border-gray-200"
+  />
+)}
+
                                             </div>
                                         </div>
                                     </div>
@@ -344,13 +382,15 @@ export default function CreateArticlePage() {
                                 </div>
 
                                 <div className="flex items-center justify-between pt-6 border-t border-gray-200">
-                                    <button
-                                        type="button"
-                                        className="px-6 py-3 text-sm font-medium text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors flex items-center gap-2"
-                                    >
-                                        <X className="w-4 h-4" />
-                                        Cancel
-                                    </button>
+                                   <button
+  type="button"
+  onClick={() => {
+    setFormData(prev => ({ ...prev, image: null }));
+    setImagePreview(null);
+  }}
+  className="text-red-500 hover:text-red-700 text-sm flex items-center gap-1"
+></button>
+
                                     <button
                                         type="submit"
                                         className="px-6 py-3 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 transition-all flex items-center gap-2 shadow-lg"
