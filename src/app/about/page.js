@@ -85,6 +85,33 @@ export default function About() {
       {/* Skills Section */}
       <section className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+         <div className="max-w-4xl mx-auto mb-20">
+          <div className="text-2xl ml-70">
+      How i learned to make website 
+    </div>
+  <div className="bg-white rounded-2xl shadow-md p-8 md:p-10">
+    
+    <div className="text-gray-700 text-lg leading-relaxed space-y-5">
+      <p>I am studying in class 7.</p>
+
+      <p>
+        In the morning and in the evening after the homework and in the holidays, I learn full stack website development. This website I make it.
+      </p>
+
+      <p>
+        If you give me a documentation, I can also make this website for you: portfolio website, news website, ecommers website, official website, organization website, etc.
+      </p>
+
+      <p>
+        I will use MongoDB database for now. My main goal is SaaS product application and Android OS, mac OS, etc.
+      </p>
+
+      <p>I am trying to learn all of that.</p>
+    </div>
+  </div>
+</div>
+
+
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
               My Skills

@@ -4,110 +4,100 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { FaGithub } from "react-icons/fa";
-import { FaYoutube } from "react-icons/fa";
-import { FaFacebook } from "react-icons/fa";
-import { FaLinkedin } from "react-icons/fa";
-import { FaWhatsappSquare } from "react-icons/fa";
+import { FaGithub, FaYoutube, FaFacebook, FaLinkedin, FaWhatsappSquare } from "react-icons/fa";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
-const [isLoggedIn, setIsLoggedIn] = useState(false);
-const [search, setSearch] = useState('');
-const [scrolled, setScrolled] = useState(false);
-const [showAnimation, setShowAnimation] = useState(false);
-const pathname = usePathname();
-const router = useRouter();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [search, setSearch] = useState('');
+  const [scrolled, setScrolled] = useState(false);
+  const [showAnimation, setShowAnimation] = useState(false);
+  const pathname = usePathname();
+  const router = useRouter();
 
-// Handle scroll effect
-useEffect(() => {
-  const checkAuth = () => {
-    const token = localStorage.getItem("token");
-    setIsLoggedIn(!!token);
+  // Handle scroll effect
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Check auth status
+  useEffect(() => {
+    const checkAuth = () => {
+      const token = localStorage.getItem("token");
+      setIsLoggedIn(!!token);
+    };
+
+    checkAuth();
+    window.addEventListener("storage", checkAuth);
+    return () => window.removeEventListener("storage", checkAuth);
+  }, [pathname]);
+
+  // Close mobile menu when route changes
+  useEffect(() => {
+    setOpen(false);
+  }, [pathname]);
+
+  // Animation effect for website text
+  useEffect(() => {
+    const startAnimation = () => {
+      setShowAnimation(true);
+      setTimeout(() => {
+        setShowAnimation(false);
+      }, 2500);
+    };
+
+    const initialTimeout = setTimeout(startAnimation, 3000);
+    const interval = setInterval(startAnimation, 20000);
+
+    return () => {
+      clearTimeout(initialTimeout);
+      clearInterval(interval);
+    };
+  }, []);
+
+  const handlelogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    window.dispatchEvent(new Event("storage"));
+    router.push("/login");
   };
 
-  checkAuth();
-
-  window.addEventListener("storage", checkAuth);
-  return () => window.removeEventListener("storage", checkAuth);
-}, [pathname]);
-
-
-// 🔥 Read login state from localStorage (NOT set)
-useEffect(() => {
-  const checkAuth = () => {
-    const token = localStorage.getItem("token");
-    setIsLoggedIn(!!token);
+  const searchToGoogle = (e) => {
+    e.preventDefault();
+    if (search.trim() !== '') {
+      window.open(`https://www.google.com/search?q=${encodeURIComponent(search)}`, "_blank");
+      setSearch('');
+    }
   };
 
-  checkAuth();
-  window.addEventListener("storage", checkAuth);
-  return () => window.removeEventListener("storage", checkAuth);
-}, [pathname]);
+  const navLinks = isLoggedIn
+    ? [
+        { href: "/dashboard", label: "Dashboard" },
+        { href: "/create-article", label: "Create Article" },
+        { href: "/update-article/id", label: "Update Article" },
+      ]
+    : [
+        { href: "/", label: "Home" },
+        { href: "/about", label: "About" },
+        { href: "/contact", label: "Contact" },
+      ];
 
-
-  // separate effect
-
-// Close mobile menu when route changes
-useEffect(() => {
-  setOpen(false);
-}, [pathname]);
-
-// Animation effect for website text
-useEffect(() => {
-  const startAnimation = () => {
-    setShowAnimation(true);
-    setTimeout(() => {
-      setShowAnimation(false);
-    }, 2500);
-  };
-
-  const initialTimeout = setTimeout(startAnimation, 3000);
-  const interval = setInterval(startAnimation, 20000);
-
-  return () => {
-    clearTimeout(initialTimeout);
-    clearInterval(interval);
-  };
-}, []);
-
-const handlelogout = () => {
-  localStorage.removeItem("token");
-  localStorage.removeItem("user");
-
-  window.dispatchEvent(new Event("storage")); // 🔥 forces Navbar + Footer to refresh
-  router.push("/login");
-};
-
-
-const searchToGoogle = (e) => {
-  e.preventDefault();
-  if (search.trim() !== '') {
-    window.open(`https://www.google.com/search?q=${encodeURIComponent(search)}`, "_blank");
-    setSearch('');
-  }
-};
-
-const navLinks = isLoggedIn
-  ? [
-      { href: "/dashboard", label: "Dashboard" },
-      { href: "/create-article", label: "Create Article" },
-      { href: "/update-article", label: "Update Article" },
-    ]
-  : [
-      { href: "/", label: "Home" },
-      { href: "/about", label: "About" },
-      { href: "/contact", label: "Contact" },
-    ];
-
-
-const isActive = (href) => pathname === href;
+  const isActive = (href) => pathname === href;
 
   return (
     <>
       {/* Top Bar */}
-      <div className="sticky top-0 w-full z-50 bg-gradient-to-r from-yellow-400 via-yellow-400 to-yellow-300 h-12 flex items-center justify-between px-4 sm:px-6 lg:px-8 shadow-lg border-b-2 border-yellow-500/30 backdrop-blur-sm relative overflow-hidden">
-        <div className="flex items-center gap-2 relative z-10">
+      <div className="sticky top-0 w-full z-50 bg-gradient-to-r from-yellow-400 via-yellow-400 to-yellow-300 h-12 flex items-center justify-between px-4 sm:px-6 lg:px-8 shadow-lg border-b-2 border-yellow-500/30 backdrop-blur-sm relative overflow-hidden">    
+        <div className="top-marquee">
+          <span className="loop-text">
+            www.phidimservice.com
+          </span>
+        </div>
+        <div className="flex items-center gap-2 relative za-10">
           <Image
             src='/nepali.png'
             height={28}
@@ -117,14 +107,6 @@ const isActive = (href) => pathname === href;
           />
           <span className="text-xs sm:text-sm font-semibold text-gray-800 hidden sm:inline-block">
             Welcome for visiting my website
-          </span>
-        </div>
-
-        {/* Animated Website Text */}
-        <div className={`absolute top-1/2 -translate-y-1/2 right-4 md:right-8 lg:right-16 z-0 transition-all duration-[2000ms] ease-out ${showAnimation ? 'translate-x-[-350px] md:translate-x-[-500px] lg:translate-x-[-650px] opacity-100 scale-105' : 'translate-x-0 opacity-0 scale-100'
-          }`}>
-          <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent font-bold text-xs sm:text-sm whitespace-nowrap drop-shadow-lg">
-            www.phidimservice.com
           </span>
         </div>
 
@@ -149,18 +131,15 @@ const isActive = (href) => pathname === href;
           </div>
         </div>
 
-        {/* Mobile */}
         <div className="md:hidden flex items-center">
           <span className="text-xs font-medium text-gray-800">Nepal 🇳🇵</span>
         </div>
       </div>
 
       {/* Main Navbar */}
-      <div className={`sticky top-12 w-full bg-white shadow-md z-50 transition-all duration-300 ${scrolled ? 'shadow-lg' : ''
-        }`}>
+      <div className={`sticky top-12 w-full bg-white shadow-md z-50 transition-all duration-300 ${scrolled ? 'shadow-lg' : ''}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-
             {/* Logo */}
             <Link href="/" className="flex items-center space-x-2 group">
               <span className="text-2xl font-bold text-blue-600 group-hover:text-blue-700 transition">
@@ -213,34 +192,26 @@ const isActive = (href) => pathname === href;
             </nav>
 
             {/* Auth Buttons - Desktop */}
-            <div className="hidden md:flex items-center gap-3 ml-4">
-             <div className="hidden md:flex items-center gap-3 ml-4">
-  {!isLoggedIn ? (
-    <Link
-      href="/login"
-      className="relative inline-flex items-center justify-center px-6 py-2.5 rounded-xl group"
-    >
-      {/* Animated neon border */}
-      <span className="absolute inset-0 rounded-xl p-[2px] bg-[linear-gradient(120deg,rgba(34,211,238,1),rgba(168,85,247,1),rgba(236,72,153,1),rgba(34,211,238,1))] bg-[length:300%_300%] animate-[borderMove_4s_linear_infinite]"></span>
-
-      {/* Inner dark background */}
-      <span className="absolute inset-[2px] rounded-xl bg-[#020617]"></span>
-
-      {/* Button text */}
-      <span className="relative z-10 bg-gradient-to-r from-cyan-300 to-purple-400 bg-clip-text text-transparent font-semibold tracking-wide">
-        Login
-      </span>
-    </Link>
-  ) : (
-    <button 
-      onClick={handlelogout}
-      className="px-5 py-2.5 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition"
-    >
-      Logout
-    </button>
-  )}
-</div>
-
+            <div className="hidden md:flex items-center gap-4">
+              {!isLoggedIn ? (
+                <Link
+                  href="/login"
+                  className="relative inline-flex items-center justify-center px-6 py-2.5 rounded-xl group"
+                >
+                  <span className="absolute inset-0 rounded-xl p-[2px] bg-[linear-gradient(120deg,rgba(34,211,238,1),rgba(168,85,247,1),rgba(236,72,153,1),rgba(34,211,238,1))] bg-[length:300%_300%] animate-[borderMove_4s_linear_infinite]"></span>
+                  <span className="absolute inset-[2px] rounded-xl bg-[#020617]"></span>
+                  <span className="relative z-10 bg-gradient-to-r from-cyan-300 to-purple-400 bg-clip-text text-transparent font-semibold tracking-wide">
+                    Login
+                  </span>
+                </Link>
+              ) : (
+                <button 
+                  onClick={handlelogout}
+                  className="px-5 py-2.5 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition"
+                >
+                  Logout
+                </button>
+              )}
             </div>
 
             {/* Mobile Menu Button */}
@@ -262,8 +233,7 @@ const isActive = (href) => pathname === href;
           </div>
 
           {/* Mobile Menu */}
-          <div className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${open ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
-            }`}>
+          <div className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${open ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
             <div className="py-4 border-t border-gray-200 space-y-2">
               {/* Mobile Nav Links */}
               {navLinks.map((link) => (
@@ -282,20 +252,34 @@ const isActive = (href) => pathname === href;
 
               {/* Mobile Auth Buttons */}
               <div className="px-4 py-2 space-y-2 border-t border-gray-200 pt-4 mt-2">
-                <Link
-                  href="/login"
-                  onClick={() => setOpen(false)}
-                  className="block w-full text-center px-4 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-medium border-2 border-transparent bg-clip-border animate-gradient-border rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
-                >
-                  Sign In
-                </Link>
-                <Link
-                  href="/register"
-                  onClick={() => setOpen(false)}
-                  className="block w-full text-center px-4 py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition"
-                >
-                  Sign Up
-                </Link>
+                {!isLoggedIn ? (
+                  <>
+                    <Link
+                      href="/login"
+                      onClick={() => setOpen(false)}
+                      className="block w-full text-center px-4 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-medium border-2 border-transparent bg-clip-border animate-gradient-border rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+                    >
+                      Sign In
+                    </Link>
+                    <Link
+                      href="/register"
+                      onClick={() => setOpen(false)}
+                      className="block w-full text-center px-4 py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition"
+                    >
+                      Sign Up
+                    </Link>
+                  </>
+                ) : (
+                  <button 
+                    onClick={() => {
+                      handlelogout();
+                      setOpen(false);
+                    }}
+                    className="block w-full text-center px-4 py-2.5 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition"
+                  >
+                    Logout
+                  </button>
+                )}
               </div>
 
               {/* Mobile Search */}

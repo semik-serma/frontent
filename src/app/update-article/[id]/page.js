@@ -1,13 +1,20 @@
-'use client';
-
-import { Camera, Save, X, User, FileText, Image as ImageIcon } from 'lucide-react';
-import { useState, useEffect } from 'react';
-import { useRef } from "react";
-import { useRouter } from "next/navigation" 
+'use client'
 import axios from 'axios';
+import { useRouter } from 'next/navigation';
+import React, { useState } from 'react'
+import { useEffect } from 'react';
+import { FaPen } from "react-icons/fa";
+import { useParams } from 'next/navigation';
+import { Camera, Save, X, User, FileText, Image as ImageIcon } from 'lucide-react';
+import { useRef } from "react";
+ 
 
-export default function CreateArticlePage() {
-    const [formData, setFormData] = useState({
+const page = () => {
+    const router = useRouter();
+    const param=useParams()
+    const id=param.id
+
+        const [formData, setFormData] = useState({
         title: '',
         author: '',
         image: null,
@@ -17,9 +24,43 @@ export default function CreateArticlePage() {
     const [activeSection, setActiveSection] = useState('title');
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
-    
-    const router = useRouter();
     const fileInputRef = useRef(null);
+    
+
+
+
+     const fetchdata=async()=>{
+        try {
+            const backendarticledata=await axios.get(`http://localhost:2000/article/display/${id}`)
+            console.log(backendarticledata)
+            setFormData({
+        title: backendarticledata.data.data.title,
+        author: backendarticledata.data.data.author,
+        image: backendarticledata.data.data.image,
+        content:backendarticledata.data.data.content 
+            })
+            setImagePreview(backendarticledata.data.data.image)
+
+            
+            
+        } catch (error) {
+            console.log('error at fetch data')
+        }
+    }
+    
+    useEffect(()=>{
+        fetchdata()
+    },[])
+  
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      router.push("/login");   // redirect if not logged in
+    }
+  }, []);
+
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -109,8 +150,8 @@ export default function CreateArticlePage() {
                 submitFormData.append('image', formData.image);
             }
 
-            const response = await axios.post(
-                "http://localhost:2000/article/create", 
+            const response = await axios.put(
+                `http://localhost:2000/article/update/${id}`, 
                 submitFormData,
                 {
                     headers: {
@@ -120,7 +161,7 @@ export default function CreateArticlePage() {
             );
             
             console.log('Success:', response.data);
-            alert('Article created successfully!');
+            alert('Article updated successfully!');
             
             // Reset form
             setFormData({
@@ -134,7 +175,7 @@ export default function CreateArticlePage() {
             
         } catch (error) {
             console.error('Error creating article:', error);
-            alert('Failed to create article. Please try again.');
+            alert('Failed to update article. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -186,9 +227,9 @@ export default function CreateArticlePage() {
             }
         }, 100);
     };
-
-    return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
+  return (
+    <div>
+         <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-6xl mx-auto">
                 <div className="flex flex-col lg:flex-row gap-8">
                     {/* Sidebar Navigation */}
@@ -419,7 +460,7 @@ export default function CreateArticlePage() {
                                         ) : (
                                             <>
                                                 <Save className="w-4 h-4" />
-                                                Create Article
+                                                update article
                                             </>
                                         )}
                                     </button>
@@ -430,5 +471,8 @@ export default function CreateArticlePage() {
                 </div>
             </div>
         </div>
-    );
+    </div>
+  )
 }
+
+export default page

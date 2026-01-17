@@ -2,12 +2,87 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-
+import { MessageCircle, Send, User, Heart, Share2, Eye } from "lucide-react"; // Added Eye icon
+import axios from "axios";
+import { FaArrowAltCircleRight } from "react-icons/fa";
 export default function Home() {
 
+  const [newComment, setNewComment] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [commentCount, setCommentCount] = useState(0);
+  const [comment,setcomment]=useState([])
+  
+  const userscomment=async(event)=>{
+    console.log(event.target.value)
+    setcomment(event.target.value)
+  }
+
+  const fetchcomment=async()=>{
+    const getcomment=await axios.get('http://localhost:2000/commentget')
+    comment({
+      usercomment:getcomment.data.data
+    })
+  }
+ 
+
+  useEffect(() => {
+
+
+  }, []);
+
+
+
+const handlecomment=async()=>{
+  try {
+  const data={comment}
+  const backendcomment=await axios.post('http://localhost:2000/comment')
+  const usercommentname=await axios.get('http://localhost:2000/useremail')
+  comment({
+    name:usercommentname.data.data
+  })
+  alert('thankyou for your comment')
+  } catch (error) {
+    alert('error at comment')
+  }
+  
+}
+
+  const formatCommentDate = (dateString) => {
+    if (!dateString) return "Just now";
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now - date;
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 1) return "Just now";
+    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffDays < 7) return `${diffDays}d ago`;
+    
+    return date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric"
+    });
+  };
 
   const openWhatsApp = () => {
-    window.open('https://wa.me/9779862772457?text=Hey i have visited your website', '_blank');
+    window.open("https://wa.me/9779862772457?text=Hey i have visited your website", "_blank");
+  };
+
+  const handleShare = () => {
+    if (navigator.share) {
+      navigator.share({
+        title: 'SemikDev - Web Developer Portfolio',
+        text: 'Check out this amazing web developer portfolio by Semik!',
+        url: window.location.href,
+      }).catch((error) => console.log('Error sharing:', error));
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+      alert('Link copied to clipboard! Share it with your friends!');
+    }
   };
 
   return (
@@ -24,23 +99,40 @@ export default function Home() {
                 My name is Semik and I am a web developer
               </p>
               <p className="text-lg text-blue-200 max-w-2xl">
-                I create a modern websites using django,nextjs and others,I love creting websites
+                I create modern websites using Django, Next.js and other technologies. I love creating websites.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link
-                  href="/register"
+                  href="/about"
                   className="bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold text-center hover:bg-blue-50 transition duration-200 shadow-lg"
                 >
                   Get Started
                 </Link>
-                <Link
-                  href="/login"
-                  className="bg-transparent border-2 border-white text-white px-8 py-4 rounded-lg font-semibold text-center hover:bg-white/10 transition duration-200"
-                >
-                  Sign In
-                </Link>
+                <div className="flex gap-4">
+                  <div className="flex gap-4 items-center">
+                    {/* Login Button */}
+                    <Link
+                      href="/login"
+                      className="bg-transparent border-2 border-white text-white px-6 py-4 rounded-lg font-semibold hover:bg-white/10 transition duration-200 flex items-center justify-center gap-2"
+                    >
+                      <User className="h-5 w-5" />
+                      Sign In
+                    </Link>
+                    
+                    
+                  </div>
+                  
+                  {/* Share Button */}
+                  <button
+                    onClick={handleShare}
+                    className="bg-white/20 border-2 border-white/50 text-white px-6 py-4 rounded-lg font-semibold hover:bg-white/30 transition duration-200 flex items-center justify-center gap-2"
+                    title="Share this website"
+                  >
+                    <Share2 className="h-5 w-5" />
+                    Share
+                  </button>
+                </div>
               </div>
-
             </div>
             <div className="hidden lg:block">
               <div className="relative h-100 w-full bg-blue-500/20 rounded-2xl backdrop-blur-sm border border-white/20 flex items-center justify-center rounded-[100px] overflow-hidden">
@@ -51,33 +143,43 @@ export default function Home() {
                   className="object-cover rounded-2xl"
                   priority
                 />
-                
               </div>
-<div className="flex items-center gap-35  mt-10 ml-23 ">
-  {/* Download CV */}
-  <button className="bg-[#020617]  px-4 py-1.5 rounded-lg text-sm font-semibold text-cyan-300 border border-cyan-400 shadow-[0_0_10px_rgba(34,211,238,0.5)] hover:shadow-[0_0_18px_rgba(34,211,238,0.9)] hover:scale-105 transition-all duration-300">
-    <a href="/" download>
-      📄 Download cv
-    </a>
-  </button>
+            <div className="flex items-center gap-8 mt-10 border-2 pl-20 rounded-[20px]">
 
-  {/* Hire Me */}
+  {/* Download CV */}
+  <div className="flex justify-center items-center">  <a
+    href="/"
+    download
+    className="bg-[#020617] px-4 py-1.5 rounded-lg text-sm font-semibold text-cyan-300 border border-cyan-400
+               shadow-[0_0_10px_rgba(34,211,238,0.5)]
+               hover:shadow-[0_0_18px_rgba(34,211,238,0.9)]
+               hover:scale-105 transition-all duration-300"
+  >
+    📄 Download CV
+  </a></div>
+
+
+  {/* Hire Button */}
   <button
-    onClick={openWhatsApp}
-    className="bg-gradient-to-r from-purple-600 to-pink-600 px-4 py-1.5 rounded-lg text-sm font-semibold text-white shadow-[0_0_10px_rgba(236,72,153,0.6)] hover:shadow-[0_0_18px_rgba(236,72,153,1)] hover:scale-105 transition-all duration-300"
+    onClick={() =>
+      window.open("https://wa.me/1234567890", "_blank")
+    }
+    className="bg-gradient-to-r from-purple-600 to-pink-600 px-4 py-1.5 rounded-lg text-sm font-semibold text-white
+               shadow-[0_0_10px_rgba(236,72,153,0.6)]
+               hover:shadow-[0_0_18px_rgba(236,72,153,1)]
+               hover:scale-105 transition-all duration-300"
   >
     💬 Hire
   </button>
+
 </div>
-
-
-
 
             </div>
           </div>
         </div>
       </section>
 
+      {/* Rest of your code remains the same... */}
       {/* Features Section */}
       <section className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -96,7 +198,7 @@ export default function Home() {
               <div className="text-4xl mb-4">💻</div>
               <h3 className="text-2xl font-bold text-gray-800 mb-3">Frontend Development</h3>
               <p className="text-gray-600">
-               I create frontend with nextjs,django and others with the experience about 1 to 2 years 
+                I create frontend with Next.js, Django and others with 1-2 years of experience.
               </p>
             </div>
 
@@ -105,7 +207,7 @@ export default function Home() {
               <div className="text-4xl mb-4">🎨</div>
               <h3 className="text-2xl font-bold text-gray-800 mb-3">UI/UX Design</h3>
               <p className="text-gray-600">
-                Beautiful and intuitive user interfaces designed with user experience in mind, ensuring your users love your product.
+                Beautiful and intuitive user interfaces designed with user experience in mind.
               </p>
             </div>
 
@@ -114,7 +216,7 @@ export default function Home() {
               <div className="text-4xl mb-4">⚡</div>
               <h3 className="text-2xl font-bold text-gray-800 mb-3">Performance</h3>
               <p className="text-gray-600">
-                Optimized applications that load fast and provide smooth user experiences across all devices.
+                Optimized applications that load fast and provide smooth user experiences.
               </p>
             </div>
 
@@ -123,7 +225,7 @@ export default function Home() {
               <div className="text-4xl mb-4">📱</div>
               <h3 className="text-2xl font-bold text-gray-800 mb-3">Responsive Design</h3>
               <p className="text-gray-600">
-                Mobile-first approach ensuring your website looks perfect on all screen sizes from mobile to desktop.
+                Mobile-first approach ensuring perfect display on all screen sizes.
               </p>
             </div>
 
@@ -132,7 +234,7 @@ export default function Home() {
               <div className="text-4xl mb-4">🔒</div>
               <h3 className="text-2xl font-bold text-gray-800 mb-3">Secure & Reliable</h3>
               <p className="text-gray-600">
-                Built with security best practices and reliable architecture to keep your application safe and stable.
+                Built with security best practices and reliable architecture.
               </p>
             </div>
 
@@ -141,15 +243,34 @@ export default function Home() {
               <div className="text-4xl mb-4">🔄</div>
               <h3 className="text-2xl font-bold text-gray-800 mb-3">Maintenance & Support</h3>
               <p className="text-gray-600">
-                Ongoing support and maintenance to keep your application up-to-date and running smoothly.
+                Ongoing support and maintenance to keep your application running smoothly.
               </p>
             </div>
           </div>
         </div>
       </section>
+      {/* {comment section} */}
+      <div>
+        <div>
+          Add your ideas here
+        </div>
+        <div>
+          <textarea placeholder="comment" value={comment} onChange={userscomment}></textarea>
+          <button type="submit" onClick={handlecomment}><FaArrowAltCircleRight /></button>
+        </div>
+        <div>
+          {/* {comment.map(item=>{
+            <div key={item.id}>
+              <div>{item.comment}</div>
+            </div>
+          })} */}
+        </div>
+      </div>
+
+  
 
       {/* About Section */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
@@ -157,7 +278,7 @@ export default function Home() {
                 About Semik
               </h2>
               <p className="text-lg text-gray-600 mb-4">
-                I am experienced developer with the experience abiut 2 years now i want to learn flutter and create a mobile application.I want to succed in my lkife and make my mom dad proud of me.
+                I am an experienced developer with about 2 years of experience. I want to learn Flutter and create mobile applications. I want to succeed in my life and make my mom and dad proud of me.
               </p>
               <p className="text-lg text-gray-600 mb-4">
                 Whether you're looking for a simple website or a complex web application, I'm here to help you achieve your goals.
@@ -212,10 +333,10 @@ export default function Home() {
         </div>
       </section>
 
-      {/* WhatsApp Floating Button - Bottom Right */}
-      <div className="fixed bottom-5 right-5 z-50 animate-fade-in">
+      {/* WhatsApp Floating Button */}
+      <div className="fixed bottom-5 right-5 z-50">
         <button
-          onClick={() => openWhatsApp('What can I help you with')}
+          onClick={openWhatsApp}
           className="flex items-center gap-3 bg-[#27AE60] hover:bg-[#219653] text-white px-5 py-3 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105 hover:shadow-xl"
           aria-label="Chat on WhatsApp"
         >

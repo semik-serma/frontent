@@ -2,39 +2,42 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import axios from "axios";
 
 export default function Contact() {
-  const [formData, setFormData] = useState({
-    name: '',
-    subject: '',
-    message: ''
-  });
+  const [name,setname]=useState('')
+  const [sub,setssub]=useState('')
+  const [message,setmessage]=useState('')
+  const usersname=(event)=>{
+    console.log(event.target.value)
+    setname(event.target.value)
+  }
+  const userssub=(event)=>{
+    console.log(event.target.value)
+    setssub(event.target.value)
+  }
+  const usersmessage=(event)=>{
+    console.log(event.target.value)
+    setmessage(event.target.value)
+  }
+  const handlecontact=async()=>{
+    try {
+      const data={name,sub,message}
+      console.log('this is data',data)
+      const process=await axios.post('http://localhost:2000/contact',data)
+      console.log(process)
+    alert('successfully send message we promise that we will reply untill 24 hours')
+    
+    } catch (error) {
+      alert('error at handle contact')
+    }
+    
+  }
 
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const submissionData = {
-      ...formData,
-      submittedAt: new Date().toISOString()
-    };
-
-    console.log('Form submitted:', submissionData);
-    alert('Thank you for your message! We will get back to you soon.');
 
     // Reset form
-    setFormData({
-      name: '',
-      subject: '',
-      message: ''
-    });
-  };
+ 
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
@@ -68,7 +71,7 @@ export default function Contact() {
             {/* Contact Form */}
             <div className="bg-white rounded-2xl shadow-lg p-8">
               <h2 className="text-2xl font-bold text-gray-900 mb-6">Send us a message</h2>
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form  className="space-y-6">
                 <div>
                   <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
                     Your Name
@@ -77,8 +80,8 @@ export default function Contact() {
                     type="text"
                     id="name"
                     name="name"
-                    value={formData.name}
-                    onChange={handleChange}
+                    value={name}
+                    onChange={usersname}
                     required
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent transition"
                     placeholder="John Doe"
@@ -93,8 +96,8 @@ export default function Contact() {
                     type="text"
                     id="subject"
                     name="subject"
-                    value={formData.subject}
-                    onChange={handleChange}
+                    value={sub}
+                    onChange={userssub}
                     required
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent transition"
                     placeholder="How can we help?"
@@ -108,8 +111,8 @@ export default function Contact() {
                   <textarea
                     id="message"
                     name="message"
-                    value={formData.message}
-                    onChange={handleChange}
+                    value={message}
+                    onChange={usersmessage}
                     required
                     rows={5}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent transition resize-none"
@@ -121,6 +124,7 @@ export default function Contact() {
 
                 <button
                   type="submit"
+                  onClick={handlecontact}
                   className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 px-6 rounded-lg font-semibold hover:from-blue-700 hover:to-blue-800 transition duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
                 >
                   Send Message
