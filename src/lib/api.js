@@ -1,9 +1,8 @@
 
 
 
-const baseurl = window.location.hostname.includes('vercel.app')
-  ? 'http://localhost2000'
-  : 'https://backend-zdzm.onrender.com';
+// const baseurl='http://localhost:2000'
+const baseurl='https://backend-zdzm.onrender.com'
 
 export const api={
     article:{
@@ -32,7 +31,7 @@ export const api={
         contact:`${baseurl}/contact/contact`,
     },
     countrydetect:{
-        countrydetect:`${baseurl}/countrydetect`,
+        countrydetect:`${baseurl}/`,
     },
     visitcount:{
         visitcount:`${baseurl}/visit`,
