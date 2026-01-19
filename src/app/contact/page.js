@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import axios from "axios";
+import { toast } from "sonner";
 
 export default function Contact() {
   const [name,setname]=useState('')
@@ -26,10 +27,10 @@ export default function Contact() {
       console.log('this is data',data)
       const process=await axios.post('http://localhost:2000/contact',data)
       console.log(process)
-    alert('successfully send message we promise that we will reply untill 24 hours')
+    toast.success('successfully send message we promise that we will reply untill 24 hours')
     
     } catch (error) {
-      alert('error at handle contact')
+      toast.error('error at handle contact')
     }
     
   }
@@ -84,7 +85,7 @@ export default function Contact() {
                     onChange={usersname}
                     required
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent transition"
-                    placeholder="John Doe"
+                    placeholder=" Type Your name" 
                   />
                 </div>
 
@@ -100,7 +101,7 @@ export default function Contact() {
                     onChange={userssub}
                     required
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent transition"
-                    placeholder="How can we help?"
+                    placeholder=" Type Your subject"
                   />
                 </div>
 

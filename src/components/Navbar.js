@@ -5,7 +5,9 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { FaGithub, FaYoutube, FaFacebook, FaLinkedin, FaWhatsappSquare } from "react-icons/fa";
-
+import axios from 'axios'
+import Countvisitor from "./Countvisitor";
+import { toast } from "sonner";
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -14,14 +16,52 @@ export default function Navbar() {
   const [showAnimation, setShowAnimation] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
+  const [flagurl,setflagurl]=useState('')
+  const [country,setcountry]=useState('')
+  const [nepalTime, setNepalTime] = useState("");
+  const [visitorTime, setVisitorTime] = useState("");
+  const countrydetect=async()=>{
+  const response =await axios.get("/api/country")
+  console.log(response)
+  setflagurl(response.data.data)
+}
 
   // Handle scroll effect
   useEffect(() => {
+    countrydetect()
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Nepal Time and Local Time Clock
+  useEffect(() => {
+    const updateTime = () => {
+      // Nepal Time
+      const nTime = new Date().toLocaleTimeString("en-US", {
+        timeZone: "Asia/Kathmandu",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: true,
+      });
+      setNepalTime(nTime);
+
+      // Local Time (Visitor's Time)
+      const vTime = new Date().toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: true,
+      });
+      setVisitorTime(vTime);
+    };
+
+    updateTime();
+    const interval = setInterval(updateTime, 1000);
+    return () => clearInterval(interval);
   }, []);
 
   // Check auth status
@@ -74,7 +114,11 @@ export default function Navbar() {
     }
   };
 
-  const navLinks = isLoggedIn
+  const isDashboardArea = pathname.startsWith("/dashboard") || 
+                          pathname.startsWith("/create-article") || 
+                          pathname.startsWith("/update-article");
+
+  const navLinks = (isLoggedIn && isDashboardArea)
     ? [
         { href: "/dashboard", label: "Dashboard" },
         { href: "/create-article", label: "Create Article" },
@@ -91,22 +135,21 @@ export default function Navbar() {
   return (
     <>
       {/* Top Bar */}
-      <div className="sticky top-0 w-full z-50 bg-gradient-to-r from-yellow-400 via-yellow-400 to-yellow-300 h-12 flex items-center justify-between px-4 sm:px-6 lg:px-8 shadow-lg border-b-2 border-yellow-500/30 backdrop-blur-sm relative overflow-hidden">    
-        <div className="top-marquee">
-          <span className="loop-text">
-            www.phidimservice.com
-          </span>
-        </div>
-        <div className="flex items-center gap-2 relative za-10">
-          <Image
-            src='/nepali.png'
-            height={28}
-            width={28}
-            alt="Nepali Flag"
-            className="rounded shadow-sm ring-1 ring-white/30"
-          />
+      <div className="sticky top-0 w-full z-50 px-[200px] bg-gradient-to-r from-yellow-400 via-yellow-400 to-yellow-300 h-12 flex items-center justify-between shadow-lg border-b-2 border-yellow-500/30 backdrop-blur-sm relative overflow-hidden">    
+        <div className="flex items-center gap-4 relative z-10">
+          <Image src={`https://flagcdn.com/${flagurl}.svg`} height={40} width={40} alt="coutry image"></Image>
           <span className="text-xs sm:text-sm font-semibold text-gray-800 hidden sm:inline-block">
             Welcome for visiting my website
+          </span>
+        </div>
+
+        {/* Centered Times */}
+        <div className="absolute left-1/2 -translate-x-1/2 hidden lg:flex items-center gap-[70px]">
+          <span className="text-xs sm:text-sm font-bold text-blue-700 bg-white/40 px-3 py-0.5 rounded-md shadow-sm">
+            NP Time: {nepalTime}
+          </span>
+          <span className="text-xs sm:text-sm font-bold text-green-700 bg-white/40 px-3 py-0.5 rounded-md shadow-sm">
+            Local Time: {visitorTime}
           </span>
         </div>
 
@@ -141,11 +184,19 @@ export default function Navbar() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
-            <Link href="/" className="flex items-center space-x-2 group">
-              <span className="text-2xl font-bold text-blue-600 group-hover:text-blue-700 transition">
-                Semik<span className="text-gray-800">Dev</span>
-              </span>
-            </Link>
+            {isLoggedIn ? (
+              <Link href={pathname === "/" ? "/dashboard" : "/"} className="flex items-center space-x-2 group">
+                <span className="text-2xl font-bold text-blue-600 group-hover:text-blue-700 transition">
+                  {pathname === "/" ? "Back to Dashboard" : "Back to Home"}
+                </span>
+              </Link>
+            ) : (
+              <div className="flex items-center space-x-2 group">
+                <span className="text-2xl font-bold text-blue-600 cursor-default">
+                  SemikDev
+                </span>
+              </div>
+            )}
 
             {/* Search Bar - Desktop */}
             <form
@@ -190,30 +241,33 @@ export default function Navbar() {
                 </Link>
               ))}
             </nav>
-
-            {/* Auth Buttons - Desktop */}
-            <div className="hidden md:flex items-center gap-4">
-              {!isLoggedIn ? (
-                <Link
-                  href="/login"
-                  className="relative inline-flex items-center justify-center px-6 py-2.5 rounded-xl group"
-                >
-                  <span className="absolute inset-0 rounded-xl p-[2px] bg-[linear-gradient(120deg,rgba(34,211,238,1),rgba(168,85,247,1),rgba(236,72,153,1),rgba(34,211,238,1))] bg-[length:300%_300%] animate-[borderMove_4s_linear_infinite]"></span>
-                  <span className="absolute inset-[2px] rounded-xl bg-[#020617]"></span>
-                  <span className="relative z-10 bg-gradient-to-r from-cyan-300 to-purple-400 bg-clip-text text-transparent font-semibold tracking-wide">
-                    Login
-                  </span>
-                </Link>
-              ) : (
-                <button 
-                  onClick={handlelogout}
-                  className="px-5 py-2.5 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition"
-                >
-                  Logout
-                </button>
-              )}
+            <div className="flex items-center gap-6">
+              {/* Auth Buttons - Desktop */}
+              <div className="hidden md:flex items-center gap-4">
+                {!isLoggedIn ? (
+                  <Link
+                    href="/login"
+                    className="relative inline-flex items-center justify-center px-6 py-2.5 rounded-xl group"
+                  >
+                    <span className="absolute inset-0 rounded-xl p-[2px] bg-[linear-gradient(120deg,rgba(34,211,238,1),rgba(168,85,247,1),rgba(236,72,153,1),rgba(34,211,238,1))] bg-[length:300%_300%] animate-[borderMove_4s_linear_infinite]"></span>
+                    <span className="absolute inset-[2px] rounded-xl bg-[#020617]"></span>
+                    <span className="relative z-10 bg-gradient-to-r from-cyan-300 to-purple-400 bg-clip-text text-transparent font-semibold tracking-wide">
+                      Login
+                    </span>
+                  </Link>
+                ) : (
+                  <button
+                    onClick={handlelogout}
+                    className="px-5 py-2.5 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition"
+                  >
+                    Logout
+                  </button>
+                )}
+              </div>
+              <div className="flex items-center">
+                <Countvisitor />
+              </div>
             </div>
-
             {/* Mobile Menu Button */}
             <button
               className="md:hidden p-2 text-gray-700 hover:text-blue-600 hover:bg-gray-100 rounded-lg transition"

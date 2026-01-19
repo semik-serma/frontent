@@ -13,7 +13,6 @@ export default function ArticleDisplay() {
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedAuthor, setSelectedAuthor] = useState('all');
-    
     // Comment section states
     const [comments, setComments] = useState([]);
     const [newComment, setNewComment] = useState('');
@@ -21,11 +20,11 @@ export default function ArticleDisplay() {
     const [commentLoading, setCommentLoading] = useState(true);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [userName, setUserName] = useState('');
-
+    const [comment,setcomment]=useState('')
     useEffect(() => {
         checkAuthStatus();
         fetchArticles();
-        fetchComments();
+        afterlogindisplaycomment();
     }, []);
 
     const checkAuthStatus = () => {
@@ -61,9 +60,10 @@ export default function ArticleDisplay() {
         }
     };
 
-    const fetchComments = async () => {
+    const afterlogindisplaycomment = async () => {
         try {
-            const response = await axios.get('http://localhost:2000/commentget');
+            const response = await axios.get('http://localhost:2000/afterlogincommentsget');
+            console.log(response)
             setComments(Array.isArray(response.data) ? response.data : []);
         } catch (error) {
             console.error('Error fetching comments:', error);
@@ -89,15 +89,15 @@ export default function ArticleDisplay() {
 
         try {
             setSubmitting(true);
-            
-            // Add user info to comment
-            await axios.post('http://localhost:2000/comment', {
-                comment: newComment,
-                user: userName || 'User'
-            });
+            const data = {
+                comment: newComment.trim(),
+                user: userName
+            }
+            // Use afterlogincomment route
+            await axios.post('http://localhost:2000/afterlogincomment', data);
 
             setNewComment('');
-            fetchComments();
+            afterlogindisplaycomment();
             
             alert('Thank you for your comment!');
             
@@ -587,8 +587,16 @@ export default function ArticleDisplay() {
                                                             </button>
                                                         </div>
                                                         <p className="text-gray-700 leading-relaxed">
-                                                            {commentText}
+                                                            {commentText.length > 100 
+                                                                ? `${commentText.substring(0, 100)}...` 
+                                                                : commentText}
                                                         </p>
+                                                        <Link 
+                                                            href={`/comment/${comment._id}`}
+                                                            className="text-blue-600 hover:text-blue-800 text-sm font-medium mt-2 inline-block"
+                                                        >
+                                                            Read More
+                                                        </Link>
                                                     </div>
                                                 </div>
                                             </div>

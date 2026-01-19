@@ -99,7 +99,7 @@ export default function About() {
       </p>
 
       <p>
-        If you give me a documentation, I can also make this website for you: portfolio website, news website, ecommers website, official website, organization website, etc.
+        If you give me a documentation, I can also make this website for you: portfolio website, news website, e-commerce website, official website, organization website, etc.
       </p>
 
       <p>

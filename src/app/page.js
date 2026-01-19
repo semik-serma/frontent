@@ -2,51 +2,127 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { MessageCircle, Send, User, Heart, Share2, Eye } from "lucide-react"; // Added Eye icon
+import { MessageCircle, Send, User, Heart, Share2, Eye } from "lucide-react";
 import axios from "axios";
 import { FaArrowAltCircleRight } from "react-icons/fa";
-export default function Home() {
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
-  const [newComment, setNewComment] = useState("");
+export default function Home() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [commentCount, setCommentCount] = useState(0);
-  const [comment,setcomment]=useState([])
-  
-  const userscomment=async(event)=>{
-    console.log(event.target.value)
-    setcomment(event.target.value)
-  }
+  const [comment, setComment] = useState("");
+  const [isloggedin, setIsLoggedIn] = useState(false);
+  const router = useRouter();
+  const [data, setData] = useState([]);
 
-  const fetchcomment=async()=>{
-    const getcomment=await axios.get('http://localhost:2000/commentget')
-    comment({
-      usercomment:getcomment.data.data
-    })
-  }
- 
+  const backendcall = async () => {
+    try {
+      setLoading(true);
+      console.log("Fetching comments...");
+      const response = await axios.get('http://localhost:2000/commentget');
+      console.log('Comments response:', response.data);
+      setData(response.data || []);
+      setCommentCount(response.data?.length || 0);
+    } catch (error) {
+      console.error('Error fetching comments:', error);
+      toast.error('Failed to load comments');
+      setData([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const visitorcountpost = async () => {
+    try {
+      const result = await axios.post('http://localhost:2000', {
+        visitor: crypto.randomUUID()
+      });
+      console.log('Visitor count posted:', result);
+    } catch (error) {
+      console.error('Error posting visitor count:', error);
+    }
+  };
 
   useEffect(() => {
-
-
+    const token = localStorage.getItem('token');
+    const user = localStorage.getItem('user');
+    
+    if (!token || !user) {
+      setIsLoggedIn(false);
+      console.log('User not logged in');
+    } else {
+      setIsLoggedIn(true);
+      console.log('User logged in:', user);
+    }
+    
+    backendcall();
+    visitorcountpost();
   }, []);
 
+  const handleCommentChange = (event) => {
+    setComment(event.target.value);
+  };
 
+  const handlecomment = async () => {
+    try {
+      if (!isloggedin) {
+        toast.error('Login required to comment');
+        router.push('/login');
+        return;
+      }
 
-const handlecomment=async()=>{
-  try {
-  const data={comment}
-  const backendcomment=await axios.post('http://localhost:2000/comment')
-  const usercommentname=await axios.get('http://localhost:2000/useremail')
-  comment({
-    name:usercommentname.data.data
-  })
-  alert('thankyou for your comment')
-  } catch (error) {
-    alert('error at comment')
-  }
-  
-}
+      if (!comment.trim()) {
+        toast.error('Please enter a comment');
+        return;
+      }
+
+      setSubmitting(true);
+      
+      console.log("Sending comment:", comment);
+      
+      const response = await axios.post('http://localhost:2000/comment', {
+        comment: comment.trim()
+      });
+      
+      console.log("Response from server:", response.data);
+      
+      if (response.data && response.data.success !== false) {
+        toast.success('Thank you for your comment!');
+        setComment('');
+        
+        // Refresh comments immediately
+        await backendcall();
+      } else {
+        toast.error(response.data?.message || 'Failed to post comment');
+      }
+    } catch (error) {
+      console.error('Full error object:', error);
+      
+      if (error.response) {
+        console.error('Server response:', error.response.data);
+        console.error('Status code:', error.response.status);
+        
+        if (error.response.status === 401) {
+          toast.error('Please login again');
+          router.push('/login');
+        } else if (error.response.data?.message) {
+          toast.error(error.response.data.message);
+        } else {
+          toast.error('Server error: ' + error.response.status);
+        }
+      } else if (error.request) {
+        console.error('No response received:', error.request);
+        toast.error('Cannot connect to server. Please check your connection.');
+      } else {
+        console.error('Request setup error:', error.message);
+        toast.error('Error: ' + error.message);
+      }
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   const formatCommentDate = (dateString) => {
     if (!dateString) return "Just now";
@@ -81,7 +157,7 @@ const handlecomment=async()=>{
       }).catch((error) => console.log('Error sharing:', error));
     } else {
       navigator.clipboard.writeText(window.location.href);
-      alert('Link copied to clipboard! Share it with your friends!');
+      toast.success('Link copied to clipboard! Share it with your friends!');
     }
   };
 
@@ -110,7 +186,6 @@ const handlecomment=async()=>{
                 </Link>
                 <div className="flex gap-4">
                   <div className="flex gap-4 items-center">
-                    {/* Login Button */}
                     <Link
                       href="/login"
                       className="bg-transparent border-2 border-white text-white px-6 py-4 rounded-lg font-semibold hover:bg-white/10 transition duration-200 flex items-center justify-center gap-2"
@@ -118,11 +193,8 @@ const handlecomment=async()=>{
                       <User className="h-5 w-5" />
                       Sign In
                     </Link>
-                    
-                    
                   </div>
                   
-                  {/* Share Button */}
                   <button
                     onClick={handleShare}
                     className="bg-white/20 border-2 border-white/50 text-white px-6 py-4 rounded-lg font-semibold hover:bg-white/30 transition duration-200 flex items-center justify-center gap-2"
@@ -144,43 +216,39 @@ const handlecomment=async()=>{
                   priority
                 />
               </div>
-            <div className="flex items-center gap-8 mt-10 border-2 pl-20 rounded-[20px]">
+              <div className="flex items-center gap-8 mt-10  pl-[160px]  rounded-[20px]">
+                <div className="flex justify-center items-center"> 
+                  <a
+                    href="/cv"
+                    download
+                    className="bg-[#020617] px-4 py-1.5 rounded-lg text-sm font-semibold text-cyan-300 border border-cyan-400
+                             shadow-[0_0_10px_rgba(34,211,238,0.5)]
+                             hover:shadow-[0_0_18px_rgba(34,211,238,0.9)]
+                             hover:scale-105 transition-all duration-300"
+                  >
+                    📄 Download CV
+                  </a>
+                </div>
 
-  {/* Download CV */}
-  <div className="flex justify-center items-center">  <a
-    href="/"
-    download
-    className="bg-[#020617] px-4 py-1.5 rounded-lg text-sm font-semibold text-cyan-300 border border-cyan-400
-               shadow-[0_0_10px_rgba(34,211,238,0.5)]
-               hover:shadow-[0_0_18px_rgba(34,211,238,0.9)]
-               hover:scale-105 transition-all duration-300"
-  >
-    📄 Download CV
-  </a></div>
-
-
-  {/* Hire Button */}
-  <button
-    onClick={() =>
-      window.open("https://wa.me/1234567890", "_blank")
-    }
-    className="bg-gradient-to-r from-purple-600 to-pink-600 px-4 py-1.5 rounded-lg text-sm font-semibold text-white
-               shadow-[0_0_10px_rgba(236,72,153,0.6)]
-               hover:shadow-[0_0_18px_rgba(236,72,153,1)]
-               hover:scale-105 transition-all duration-300"
-  >
-    💬 Hire
-  </button>
-
-</div>
-
+                <div>  
+                  <button
+                    onClick={() =>
+                      window.open("https://wa.me/1234567890", "_blank")
+                    }
+                    className="bg-gradient-to-r from-purple-600 to-pink-600 px-4 py-1.5 rounded-lg text-sm font-semibold text-white
+                             shadow-[0_0_10px_rgba(236,72,153,0.6)]
+                             hover:shadow-[0_0_18px_rgba(236,72,153,1)]
+                             hover:scale-105 transition-all duration-300"
+                  >
+                    💬 Hire
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Rest of your code remains the same... */}
-      {/* Features Section */}
       <section className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
@@ -193,7 +261,6 @@ const handlecomment=async()=>{
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {/* Feature 1 */}
             <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition duration-200">
               <div className="text-4xl mb-4">💻</div>
               <h3 className="text-2xl font-bold text-gray-800 mb-3">Frontend Development</h3>
@@ -202,7 +269,6 @@ const handlecomment=async()=>{
               </p>
             </div>
 
-            {/* Feature 2 */}
             <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition duration-200">
               <div className="text-4xl mb-4">🎨</div>
               <h3 className="text-2xl font-bold text-gray-800 mb-3">UI/UX Design</h3>
@@ -211,7 +277,6 @@ const handlecomment=async()=>{
               </p>
             </div>
 
-            {/* Feature 3 */}
             <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition duration-200">
               <div className="text-4xl mb-4">⚡</div>
               <h3 className="text-2xl font-bold text-gray-800 mb-3">Performance</h3>
@@ -220,7 +285,6 @@ const handlecomment=async()=>{
               </p>
             </div>
 
-            {/* Feature 4 */}
             <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition duration-200">
               <div className="text-4xl mb-4">📱</div>
               <h3 className="text-2xl font-bold text-gray-800 mb-3">Responsive Design</h3>
@@ -229,7 +293,6 @@ const handlecomment=async()=>{
               </p>
             </div>
 
-            {/* Feature 5 */}
             <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition duration-200">
               <div className="text-4xl mb-4">🔒</div>
               <h3 className="text-2xl font-bold text-gray-800 mb-3">Secure & Reliable</h3>
@@ -238,7 +301,6 @@ const handlecomment=async()=>{
               </p>
             </div>
 
-            {/* Feature 6 */}
             <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition duration-200">
               <div className="text-4xl mb-4">🔄</div>
               <h3 className="text-2xl font-bold text-gray-800 mb-3">Maintenance & Support</h3>
@@ -249,27 +311,265 @@ const handlecomment=async()=>{
           </div>
         </div>
       </section>
-      {/* {comment section} */}
-      <div>
-        <div>
-          Add your ideas here
-        </div>
-        <div>
-          <textarea placeholder="comment" value={comment} onChange={userscomment}></textarea>
-          <button type="submit" onClick={handlecomment}><FaArrowAltCircleRight /></button>
-        </div>
-        <div>
-          {/* {comment.map(item=>{
-            <div key={item.id}>
-              <div>{item.comment}</div>
+
+      {/* Comment Section */}
+      <div
+        style={{
+          minHeight: "100vh",
+          background: "linear-gradient(135deg, #0f172a, #020617)",
+          padding: "40px",
+          display: "flex",
+          justifyContent: "center",
+          fontFamily: "Inter, system-ui, sans-serif",
+          color: "#fff"
+        }}
+      >
+        <div style={{ width: "100%", maxWidth: "720px" }}>
+          <h1
+            style={{
+              fontSize: "28px",
+              fontWeight: "800",
+              marginBottom: "20px",
+              background: "linear-gradient(90deg, #6366f1, #ec4899)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent"
+            }}
+          >
+            Add your ideas here
+          </h1>
+
+          <div
+            style={{
+              background: "rgba(255,255,255,0.08)",
+              borderRadius: "20px",
+              padding: "20px",
+              display: "flex",
+              gap: "14px",
+              alignItems: "center",
+              marginBottom: "50px",
+              backdropFilter: "blur(12px)",
+              boxShadow: "0 20px 40px rgba(0,0,0,0.35)"
+            }}
+          >
+            <textarea
+              placeholder="Give your review..."
+              value={comment}
+              onChange={handleCommentChange}
+              disabled={submitting}
+              style={{
+                flex: 1,
+                background: "transparent",
+                border: "none",
+                outline: "none",
+                resize: "none",
+                color: "#e5e7eb",
+                fontSize: "16px",
+                minHeight: "60px",
+                lineHeight: "1.5",
+                padding: "10px"
+              }}
+            />
+
+            <button
+              type="submit"
+              onClick={handlecomment}
+              disabled={submitting || !comment.trim()}
+              style={{
+                background: submitting || !comment.trim() 
+                  ? "rgba(99,102,241,0.5)" 
+                  : "linear-gradient(135deg, #6366f1, #ec4899)",
+                border: "none",
+                borderRadius: "50%",
+                width: "46px",
+                height: "46px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: submitting || !comment.trim() ? "not-allowed" : "pointer",
+                color: "#fff",
+                fontSize: "22px",
+                boxShadow: "0 10px 25px rgba(99,102,241,0.5)",
+                transition: "all 0.2s ease",
+                opacity: submitting || !comment.trim() ? 0.7 : 1
+              }}
+            >
+              {submitting ? (
+                <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div>
+              ) : (
+                <FaArrowAltCircleRight />
+              )}
+            </button>
+          </div>
+
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              marginBottom: "30px"
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+              <div
+                style={{
+                  width: "48px",
+                  height: "48px",
+                  borderRadius: "50%",
+                  background: "linear-gradient(135deg, #6366f1, #ec4899)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontWeight: "800",
+                  fontSize: "20px",
+                  boxShadow: "0 10px 30px rgba(99,102,241,0.4)"
+                }}
+              >
+                💬
+              </div>
+
+              <h2 style={{ fontSize: "24px", margin: 0 }}>
+                Comments ({commentCount})
+              </h2>
             </div>
-          })} */}
+            
+            <button
+              onClick={backendcall}
+              disabled={loading}
+              style={{
+                background: "rgba(255,255,255,0.1)",
+                border: "1px solid rgba(255,255,255,0.2)",
+                padding: "8px 16px",
+                borderRadius: "8px",
+                color: loading ? "rgba(255,255,255,0.5)" : "#e5e7eb",
+                cursor: loading ? "not-allowed" : "pointer",
+                fontSize: "14px",
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                transition: "all 0.2s ease"
+              }}
+            >
+              {loading ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></div>
+                  Loading...
+                </>
+              ) : (
+                <>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" />
+                  </svg>
+                  Refresh
+                </>
+              )}
+            </button>
+          </div>
+
+          {loading ? (
+            <div style={{
+              color: "#94a3b8",
+              textAlign: "center",
+              padding: "40px"
+            }}>
+              Loading comments...
+            </div>
+          ) : data.length > 0 ? (
+            data.map((item, idx) => (
+              <div
+                key={item._id || idx}
+                style={{
+                  position: "relative",
+                  background: "rgba(255,255,255,0.08)",
+                  borderRadius: "18px",
+                  padding: "24px 24px 24px 30px",
+                  marginBottom: "20px",
+                  backdropFilter: "blur(10px)",
+                  boxShadow: "0 20px 40px rgba(0,0,0,0.35)",
+                  border: "1px solid rgba(255,255,255,0.1)"
+                }}
+              >
+                <div
+                  style={{
+                    position: "absolute",
+                    left: 0,
+                    top: 0,
+                    width: "4px",
+                    height: "100%",
+                    borderRadius: "18px 0 0 18px",
+                    background: "linear-gradient(#6366f1, #ec4899)"
+                  }}
+                />
+
+                <p
+                  style={{
+                    color: "#e5e7eb",
+                    fontSize: "18px",
+                    lineHeight: "1.6",
+                    margin: 0,
+                    marginBottom: "12px",
+                    wordBreak: "break-word"
+                  }}
+                >
+                  {item.comment.length > 100 
+                    ? `${item.comment.substring(0, 100)}...` 
+                    : item.comment}
+                </p>
+                
+                <Link 
+                  href={`/comment/${item._id}?type=before`}
+                  className="text-blue-400 hover:text-blue-300 text-sm font-medium mb-4 inline-block"
+                >
+                  Read More
+                </Link>
+                
+                {item.createdAt && (
+                  <div style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    marginTop: "8px"
+                  }}>
+                    <p style={{
+                      color: "#94a3b8",
+                      fontSize: "12px",
+                      margin: 0
+                    }}>
+                      {formatCommentDate(item.createdAt)}
+                    </p>
+                    
+                    {item.userEmail && (
+                      <p style={{
+                        color: "#6366f1",
+                        fontSize: "12px",
+                        margin: 0,
+                        fontWeight: "500"
+                      }}>
+                        By: {item.userEmail}
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
+            ))
+          ) : (
+            <div style={{
+              color: "#94a3b8",
+              textAlign: "center",
+              padding: "40px",
+              background: "rgba(255,255,255,0.05)",
+              borderRadius: "12px",
+              border: "1px dashed rgba(255,255,255,0.1)"
+            }}>
+              <div style={{ fontSize: "48px", marginBottom: "16px" }}>💬</div>
+              <h3 style={{ fontSize: "18px", marginBottom: "8px" }}>No comments yet</h3>
+              <p style={{ fontSize: "14px", opacity: 0.8 }}>
+                {isloggedin ? "Be the first to share your thoughts!" : "Login to post the first comment!"}
+              </p>
+            </div>
+          )}
         </div>
       </div>
 
-  
-
-      {/* About Section */}
       <section className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -307,7 +607,6 @@ const handlecomment=async()=>{
         </div>
       </section>
 
-      {/* CTA Section */}
       <section className="py-20 bg-gradient-to-r from-blue-600 to-blue-700 text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
@@ -333,7 +632,6 @@ const handlecomment=async()=>{
         </div>
       </section>
 
-      {/* WhatsApp Floating Button */}
       <div className="fixed bottom-5 right-5 z-50">
         <button
           onClick={openWhatsApp}

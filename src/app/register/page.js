@@ -45,7 +45,6 @@ export default function RegisterPage() {
       }
     } catch (error) {
       console.error('Error during registration:', error);
-      alert('Registration failed: ' + (error.response?.data?.message || error.message));
     }
     finally {
       setIsLoading(false);
