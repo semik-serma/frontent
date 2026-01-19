@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import axios from 'axios';
+import { api } from '@/lib/api';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
@@ -20,7 +21,7 @@ const [email, setEmail] = useState("");
   e.preventDefault();
 
   try {
-    const response = await axios.post("http://localhost:2000/auth/loginuser", {
+    const response = await axios.post(api.auth.login, {
       email,
       password,
     });

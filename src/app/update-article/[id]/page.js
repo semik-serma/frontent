@@ -1,5 +1,6 @@
 'use client'
 import axios from 'axios';
+import { api } from '@/lib/api';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react'
 import { useEffect } from 'react';
@@ -31,7 +32,7 @@ const page = () => {
 
      const fetchdata=async()=>{
         try {
-            const backendarticledata=await axios.get(`http://localhost:2000/article/display/${id}`)
+            const backendarticledata=await axios.get(api.article.displaysingle(id))
             console.log(backendarticledata)
             setFormData({
         title: backendarticledata.data.data.title,
@@ -151,7 +152,7 @@ const page = () => {
             }
 
             const response = await axios.put(
-                `http://localhost:2000/article/update/${id}`, 
+                api.article.update(id), 
                 submitFormData,
                 {
                     headers: {

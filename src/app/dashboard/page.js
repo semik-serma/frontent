@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { api } from '@/lib/api';
 import { Calendar, User, BookOpen, MessageCircle, Send, Heart, LogIn } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -51,7 +52,7 @@ export default function ArticleDisplay() {
 
     const fetchArticles = async () => {
         try {
-            const response = await axios.get('http://localhost:2000/article/displayarticle');
+            const response = await axios.get(api.article.display);
             setArticles(response.data?.articles || []);
         } catch (error) {
             console.error('Error fetching articles:', error);
@@ -62,7 +63,7 @@ export default function ArticleDisplay() {
 
     const afterlogindisplaycomment = async () => {
         try {
-            const response = await axios.get('http://localhost:2000/afterlogincommentsget');
+            const response = await axios.get(api.comment.afterlogincommentsget);
             console.log(response)
             setComments(Array.isArray(response.data) ? response.data : []);
         } catch (error) {
@@ -94,7 +95,7 @@ export default function ArticleDisplay() {
                 user: userName
             }
             // Use afterlogincomment route
-            await axios.post('http://localhost:2000/afterlogincomment', data);
+            await axios.post(api.comment.afterlogincomment, data);
 
             setNewComment('');
             afterlogindisplaycomment();

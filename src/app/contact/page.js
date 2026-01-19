@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import axios from "axios";
+import { api } from "@/lib/api";
 import { toast } from "sonner";
 
 export default function Contact() {
@@ -25,7 +26,7 @@ export default function Contact() {
     try {
       const data={name,sub,message}
       console.log('this is data',data)
-      const process=await axios.post('http://localhost:2000/contact',data)
+      const process=await axios.post(api.Contact.contact,data)
       console.log(process)
     toast.success('successfully send message we promise that we will reply untill 24 hours')
     

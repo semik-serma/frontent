@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import axios from 'axios';
+import { api } from '@/lib/api';
 import { ArrowLeft, Calendar, User, Clock, Share2, Heart, MessageCircle, BookOpen, Send, ChevronDown, ChevronUp } from 'lucide-react';
 import Link from 'next/link';
 import { FaPen } from "react-icons/fa";
@@ -84,11 +85,10 @@ export default function ArticleDetailPage() {
     const fetchArticle = async () => {
         try {
             setLoading(true);
-            const response = await axios.get('http://localhost:2000/article/displayarticle');
-            const foundArticle = response.data.articles.find(article => article._id === id);
+            const response = await axios.get(api.article.displaysingle(id));
             
-            if (foundArticle) {
-                setArticle(foundArticle);
+            if (response.data?.data) {
+                setArticle(response.data.data);
                 setLikes(Math.floor(Math.random() * 100) + 10);
             } else {
                 setError('Article not found');
@@ -104,7 +104,7 @@ export default function ArticleDetailPage() {
     const fetchComments = async () => {
         try {
             setCommentLoading(true);
-            const response = await axios.get('http://localhost:2000/commentget');
+            const response = await axios.get(api.comment.get);
             setComments(Array.isArray(response.data) ? response.data : []);
         } catch (error) {
             console.error('Error fetching comments:', error);
@@ -195,7 +195,7 @@ export default function ArticleDetailPage() {
         try {
             setPostingComment(true);
             
-            await axios.post('http://localhost:2000/comment', {
+            await axios.post(api.comment.create, {
                 comment: newComment,
                 user: userName || 'User'
             });

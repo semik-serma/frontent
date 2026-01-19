@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import { useState, useRef } from 'react';
 import axios from 'axios';
+import { api } from '@/lib/api';
 
 export default function RegisterPage() {
   const [firstname, setFirstname] = useState('');
@@ -37,7 +38,7 @@ export default function RegisterPage() {
     try {
       setIsLoading(true);
       const data = { firstname, lastname, email, password };
-      const response = await axios.post('http://localhost:2000/auth/register', data);
+      const response = await axios.post(api.auth.register, data);
 
       if (response.status === 200) {
         // Show OTP modal after successful registration
@@ -52,7 +53,7 @@ export default function RegisterPage() {
   };
 
   const handleOtpChange = (index, value) => {
-    if (value === '' || value.length > 1) return;
+    if (value.length > 1) return;
 
     const newOtp = [...otp];
     newOtp[index] = value;
@@ -100,7 +101,7 @@ export default function RegisterPage() {
       setIsVerifying(true);
       setVerificationError('');
 
-      const response = await axios.post('http://localhost:2000/auth/verifyuser', {
+      const response = await axios.post(api.auth.verifyuser, {
         email,
         password,
         otp: otpValue,
@@ -407,7 +408,7 @@ export default function RegisterPage() {
                         key={index}
                         ref={(el) => (otpInputRefs.current[index] = el)}
                         type="text"
-                        inputMode="text"
+                        inputMode="numeric"
                         maxLength={1}
                         value={digit}
                         onChange={(e) => handleOtpChange(index, e.target.value)}

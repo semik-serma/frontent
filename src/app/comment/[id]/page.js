@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import axios from 'axios';
+import { api } from '@/lib/api';
 import { ArrowLeft, MessageCircle, Calendar, User } from 'lucide-react';
 import Link from 'next/link';
 
@@ -20,8 +21,8 @@ function CommentContent() {
             try {
                 setLoading(true);
                 const endpoint = type === 'before' 
-                    ? `http://localhost:2000/beforelogincomment/${id}`
-                    : `http://localhost:2000/afterlogincomment/${id}`;
+                    ? api.comment.beforelogincomment(id)
+                    : api.comment.afterlogincommentsgetid(id);
                 
                 const response = await axios.get(endpoint);
                 setComment(response.data);

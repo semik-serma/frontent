@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
+import { api } from '@/lib/api';
 
 export default function VerifyPage() {
     const [otp, setOtp] = useState(['', '', '', '', '', '']);
@@ -19,7 +20,8 @@ export default function VerifyPage() {
     };
 
     const handleInputChange = (index, value) => {
-        if (value === '' || isNaN(value)) return;
+        if (value.length > 1) return;
+        if (value !== "" && isNaN(value)) return;
 
         const newOtp = [...otp];
         newOtp[index] = value;
@@ -63,7 +65,7 @@ export default function VerifyPage() {
         }
 
         try {
-            const response = await axios.post('http://localhost:2000/auth/verifyuser', {
+            const response = await axios.post(api.auth.verifyuser, {
                 email,
                 password,
                 otp: otpValue
@@ -89,7 +91,7 @@ export default function VerifyPage() {
         }
 
         try {
-            const response = await axios.post('http://localhost:2000/auth/register', { email });
+            const response = await axios.post(api.auth.register, { email });
             if (response.status === 200) {
                 alert('New verification code sent to your email');
             }

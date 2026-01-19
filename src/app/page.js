@@ -4,9 +4,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { MessageCircle, Send, User, Heart, Share2, Eye } from "lucide-react";
 import axios from "axios";
+import { api } from "@/lib/api";
 import { FaArrowAltCircleRight } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+
 
 export default function Home() {
   const [loading, setLoading] = useState(true);
@@ -21,7 +23,7 @@ export default function Home() {
     try {
       setLoading(true);
       console.log("Fetching comments...");
-      const response = await axios.get('http://localhost:2000/commentget');
+      const response = await axios.get(api.comment.get);
       console.log('Comments response:', response.data);
       setData(response.data || []);
       setCommentCount(response.data?.length || 0);
@@ -36,7 +38,7 @@ export default function Home() {
 
   const visitorcountpost = async () => {
     try {
-      const result = await axios.post('http://localhost:2000', {
+      const result = await axios.post(api.visitcount.visitcount, {
         visitor: crypto.randomUUID()
       });
       console.log('Visitor count posted:', result);
@@ -82,7 +84,7 @@ export default function Home() {
       
       console.log("Sending comment:", comment);
       
-      const response = await axios.post('http://localhost:2000/comment', {
+      const response = await axios.post(api.comment.create, {
         comment: comment.trim()
       });
       
