@@ -317,7 +317,7 @@ export default function Home() {
       {/* Comment Section */}
       <div
         style={{
-          minHeight: "100vh",
+          Height: "10px",
           background: "linear-gradient(135deg, #0f172a, #020617)",
           padding: "40px",
           display: "flex",
@@ -471,12 +471,13 @@ export default function Home() {
             <div style={{
               color: "#94a3b8",
               textAlign: "center",
-              padding: "40px"
+              padding: "40px",
+              height: "100%",
             }}>
               Loading comments...
             </div>
           ) : data.length > 0 ? (
-            data.map((item, idx) => (
+            data.slice(0,1).map((item, idx) => (
               <div
                 key={item._id || idx}
                 style={{
@@ -512,7 +513,7 @@ export default function Home() {
                     wordBreak: "break-word"
                   }}
                 >
-                  {item.comment.length > 100 
+                  {item.comment.length > 100
                     ? `${item.comment.substring(0, 100)}...` 
                     : item.comment}
                 </p>

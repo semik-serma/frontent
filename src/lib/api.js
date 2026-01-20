@@ -26,6 +26,9 @@ export const api={
         afterlogincomment:`${baseurl}/afterlogincomment`,
         afterlogincommentsget:`${baseurl}/afterlogincommentsget`,
         afterlogincommentsgetid:(id)=>`${baseurl}/afterlogincomment/${id}`,
+        like:(id)=>`${baseurl}/comment/${id}/like`,
+        dislike:(id)=>`${baseurl}/comment/${id}/dislike`,
+        view:(id)=>`${baseurl}/comment/${id}/view`,
     },
     Contact:{
         contact:`${baseurl}/contact/contact`,
