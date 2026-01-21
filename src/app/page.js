@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { MessageCircle, Send, User, Heart, Share2, Eye } from "lucide-react";
+import { MessageCircle, Send, User, Heart, Share2, Eye, ThumbsUp, ThumbsDown } from "lucide-react";
 import axios from "axios";
 import { api } from "@/lib/api";
 import { FaArrowAltCircleRight } from "react-icons/fa";
@@ -18,6 +18,7 @@ export default function Home() {
   const [isloggedin, setIsLoggedIn] = useState(false);
   const router = useRouter();
   const [data, setData] = useState([]);
+  const [currentUser, setCurrentUser] = useState(null);
 
   const backendcall = async () => {
     try {
@@ -50,15 +51,20 @@ export default function Home() {
   useEffect(() => {
     const token = localStorage.getItem('token');
     const user = localStorage.getItem('user');
-    
+
     if (!token || !user) {
       setIsLoggedIn(false);
       console.log('User not logged in');
     } else {
       setIsLoggedIn(true);
       console.log('User logged in:', user);
+      try {
+        setCurrentUser(JSON.parse(user));
+      } catch (error) {
+        console.error('Error parsing user data:', error);
+      }
     }
-    
+
     backendcall();
     visitorcountpost();
   }, []);
@@ -81,19 +87,19 @@ export default function Home() {
       }
 
       setSubmitting(true);
-      
+
       console.log("Sending comment:", comment);
-      
+
       const response = await axios.post(api.comment.create, {
         comment: comment.trim()
       });
-      
+
       console.log("Response from server:", response.data);
-      
+
       if (response.data && response.data.success !== false) {
         toast.success('Thank you for your comment!');
         setComment('');
-        
+
         // Refresh comments immediately
         await backendcall();
       } else {
@@ -101,11 +107,11 @@ export default function Home() {
       }
     } catch (error) {
       console.error('Full error object:', error);
-      
+
       if (error.response) {
         console.error('Server response:', error.response.data);
         console.error('Status code:', error.response.status);
-        
+
         if (error.response.status === 401) {
           toast.error('Please login again');
           router.push('/login');
@@ -139,7 +145,7 @@ export default function Home() {
     if (diffMins < 60) return `${diffMins}m ago`;
     if (diffHours < 24) return `${diffHours}h ago`;
     if (diffDays < 7) return `${diffDays}d ago`;
-    
+
     return date.toLocaleDateString("en-US", {
       month: "short",
       day: "numeric"
@@ -160,6 +166,36 @@ export default function Home() {
     } else {
       navigator.clipboard.writeText(window.location.href);
       toast.success('Link copied to clipboard! Share it with your friends!');
+    }
+  };
+
+  const handleLike = async (commentId) => {
+    if (!isloggedin || !currentUser) {
+      toast.error('Please login to like');
+      router.push('/login');
+      return;
+    }
+    try {
+      await axios.post(api.comment.like(commentId), { userEmail: currentUser.email });
+      await backendcall();
+    } catch (error) {
+      console.error('Error liking comment:', error);
+      toast.error('Failed to like comment');
+    }
+  };
+
+  const handleDislike = async (commentId) => {
+    if (!isloggedin || !currentUser) {
+      toast.error('Please login to dislike');
+      router.push('/login');
+      return;
+    }
+    try {
+      await axios.post(api.comment.dislike(commentId), { userEmail: currentUser.email });
+      await backendcall();
+    } catch (error) {
+      console.error('Error disliking comment:', error);
+      toast.error('Failed to dislike comment');
     }
   };
 
@@ -196,7 +232,7 @@ export default function Home() {
                       Sign In
                     </Link>
                   </div>
-                  
+
                   <button
                     onClick={handleShare}
                     className="bg-white/20 border-2 border-white/50 text-white px-6 py-4 rounded-lg font-semibold hover:bg-white/30 transition duration-200 flex items-center justify-center gap-2"
@@ -219,7 +255,7 @@ export default function Home() {
                 />
               </div>
               <div className="flex items-center gap-8 mt-10  pl-[160px]  rounded-[20px]">
-                <div className="flex justify-center items-center"> 
+                <div className="flex justify-center items-center">
                   <a
                     href="/cv"
                     download
@@ -232,7 +268,7 @@ export default function Home() {
                   </a>
                 </div>
 
-                <div>  
+                <div>
                   <button
                     onClick={() =>
                       window.open("https://wa.me/1234567890", "_blank")
@@ -377,8 +413,8 @@ export default function Home() {
               onClick={handlecomment}
               disabled={submitting || !comment.trim()}
               style={{
-                background: submitting || !comment.trim() 
-                  ? "rgba(99,102,241,0.5)" 
+                background: submitting || !comment.trim()
+                  ? "rgba(99,102,241,0.5)"
                   : "linear-gradient(135deg, #6366f1, #ec4899)",
                 border: "none",
                 borderRadius: "50%",
@@ -433,7 +469,7 @@ export default function Home() {
                 Comments ({commentCount})
               </h2>
             </div>
-            
+
             <button
               onClick={backendcall}
               disabled={loading}
@@ -477,7 +513,7 @@ export default function Home() {
               Loading comments...
             </div>
           ) : data.length > 0 ? (
-            data.slice(0,1).map((item, idx) => (
+            data.slice(0, 1).map((item, idx) => (
               <div
                 key={item._id || idx}
                 style={{
@@ -514,42 +550,90 @@ export default function Home() {
                   }}
                 >
                   {item.comment.length > 100
-                    ? `${item.comment.substring(0, 100)}...` 
+                    ? `${item.comment.substring(0, 100)}...`
                     : item.comment}
                 </p>
-                
-                <Link 
+
+                <Link
                   href={`/comment/${item._id}?type=before`}
-                  className="text-blue-400 hover:text-blue-300 text-sm font-medium mb-4 inline-block"
+                  className="text-blue-400 hover:text-blue-300 text-sm font-medium mb-4  inline-block"
                 >
                   Read More
                 </Link>
-                
+
                 {item.createdAt && (
                   <div style={{
                     display: "flex",
-                    justifyContent: "space-between",
+                    flexWrap: "wrap",
+                    gap: "10px",
                     alignItems: "center",
-                    marginTop: "8px"
+                    marginTop: "16px",
+                    borderTop: "1px solid rgba(255,255,255,0.1)",
+                    paddingTop: "16px"
                   }}>
-                    <p style={{
-                      color: "#94a3b8",
+                    {/* Author Badge */}
+                    <div style={{
+                      background: "rgba(255,255,255,0.1)",
+                      padding: "6px 14px",
+                      borderRadius: "20px",
                       fontSize: "12px",
-                      margin: 0
+                      color: "#e5e7eb",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px"
                     }}>
-                      {formatCommentDate(item.createdAt)}
-                    </p>
-                    
-                    {item.userEmail && (
-                      <p style={{
-                        color: "#6366f1",
+                      <User size={14} className="text-blue-400" />
+                      {item.userName || item.userEmail?.split('@')[0] || "Anonymous"}
+                    </div>
+
+
+                    {/* Like Button */}
+                    <button
+                      onClick={() => handleLike(item._id)}
+                      style={{
+                        background: "rgba(59, 130, 246, 0.1)",
+                        border: "1px solid rgba(59, 130, 246, 0.3)",
+                        padding: "6px 14px",
+                        borderRadius: "20px",
                         fontSize: "12px",
-                        margin: 0,
-                        fontWeight: "500"
-                      }}>
-                        By: {item.userEmail}
-                      </p>
-                    )}
+                        color: "#60a5fa",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "6px",
+                        cursor: "pointer",
+                        transition: "all 0.2s"
+                      }}
+                      className="hover:bg-blue-500/20"
+                    >
+                      <ThumbsUp size={14} fill={currentUser && item.likes?.includes(currentUser.email) ? "currentColor" : "none"} />
+                      {item.likes?.length || 0}
+                    </button>
+
+                    {/* Dislike Button */}
+                    <button
+                      onClick={() => handleDislike(item._id)}
+                      style={{
+                        background: "rgba(239, 68, 68, 0.1)",
+                        border: "1px solid rgba(239, 68, 68, 0.3)",
+                        padding: "6px 14px",
+                        borderRadius: "20px",
+                        fontSize: "12px",
+                        color: "#f87171",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "6px",
+                        cursor: "pointer",
+                        transition: "all 0.2s"
+                      }}
+                      className="hover:bg-red-500/20"
+                    >
+                      <ThumbsDown size={14} fill={currentUser && item.dislikes?.includes(currentUser.email) ? "currentColor" : "none"} />
+                      {item.dislikes?.length || 0}
+                    </button>
+
+                    <div style={{ marginLeft: "auto", fontSize: "11px", color: "#94a3b8" }}>
+                      {formatCommentDate(item.createdAt)}
+                    </div>
                   </div>
                 )}
               </div>

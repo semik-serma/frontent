@@ -1,43 +1,45 @@
 
+const baseurl = 'http://localhost:2000'
+// const baseurl = 'https://backend-zdzm.onrender.com'
 
+export const api = {
+    article: {
+        create: `${baseurl}/article/create`,
+        display: `${baseurl}/article/displayarticle`,
+        displaysingle: (id) => `${baseurl}/article/displayarticle/${id}`,
+        delete: (id) => `${baseurl}/article/deletearticle/${id}`,
+        update: (id) => `${baseurl}/article/updatearticle/${id}`
+    },
+    auth: {
+        login: `${baseurl}/auth/loginuser`,
+        verifyuser: `${baseurl}/auth/verifyuser`,
+        register: `${baseurl}/auth/register`,
+        logout: `${baseurl}/auth/logout`
+    },
+    comment: {
+        create: `${baseurl}/comment`,
+        get: `${baseurl}/commentget`,
+        beforelogincomment: (id) => `${baseurl}/beforelogincomment/${id}`,
+        getuseremail: (id) => `${baseurl}/useremail/${id}`,
+        afterlogincomment: `${baseurl}/afterlogincomment`,
+        afterlogincommentsget: `${baseurl}/afterlogincommentsget`,
+        afterlogincommentsgetid: (id) => `${baseurl}/afterlogincomment/${id}`,
+        like: (id) => `${baseurl}/user/like/${id}`,
+        dislike: (id) => `${baseurl}/user/dislike/${id}`,
+        view: (id) => `${baseurl}/comment/${id}/view`,
+    },
+    Contact: {
+        contact: `${baseurl}/contact/contact`,
+    },
+    countrydetect: {
+        countrydetect: `${baseurl}/`,
+    },
+    visitcount: {
+        visitcount: `${baseurl}/visit`,
+        visitcountget: `${baseurl}/visit`,
+    },
+    userfeling: {
+        like: `${baseurl}/user/like`,
 
-// const baseurl='http://localhost:2000'
-const baseurl='https://backend-zdzm.onrender.com'
-
-export const api={
-    article:{
-        create:`${baseurl}/article/create`,
-        display:`${baseurl}/article/displayarticle`,
-        displaysingle:(id)=>`${baseurl}/article/displayarticle/${id}`,
-        delete:(id)=>`${baseurl}/article/deletearticle/${id}`,
-        update:(id)=>`${baseurl}/article/updatearticle/${id}`
-    },
-    auth:{
-        login:`${baseurl}/auth/loginuser`,
-        verifyuser:`${baseurl}/auth/verifyuser`,
-        register:`${baseurl}/auth/register`,
-        logout:`${baseurl}/auth/logout`
-    },
-    comment:{
-        create:`${baseurl}/comment`,
-        get:`${baseurl}/commentget`,
-        beforelogincomment:(id)=>`${baseurl}/beforelogincomment/${id}`,
-        getuseremail:(id)=>`${baseurl}/useremail/${id}`,
-        afterlogincomment:`${baseurl}/afterlogincomment`,
-        afterlogincommentsget:`${baseurl}/afterlogincommentsget`,
-        afterlogincommentsgetid:(id)=>`${baseurl}/afterlogincomment/${id}`,
-        like:(id)=>`${baseurl}/comment/${id}/like`,
-        dislike:(id)=>`${baseurl}/comment/${id}/dislike`,
-        view:(id)=>`${baseurl}/comment/${id}/view`,
-    },
-    Contact:{
-        contact:`${baseurl}/contact/contact`,
-    },
-    countrydetect:{
-        countrydetect:`${baseurl}/`,
-    },
-    visitcount:{
-        visitcount:`${baseurl}/visit`,
-        visitcountget:`${baseurl}/visit`,
     }
 }
